@@ -1,52 +1,32 @@
-# Prerequisites
-*.d
-
-# Object files
 *.o
-*.ko
-*.obj
-*.elf
-
-# Linker output
-*.ilk
-*.map
-*.exp
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
 *.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
 *.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
-
-# Debug files
-*.dSYM/
-*.su
+*.swp
+*.pdb 
+*.ilk 
 *.idb
-*.pdb
-
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
+*.obj
+*.lib
+*.exp
+*.exe
+*.os
+.sconsign.dblite
+lua/demo1
+lua/lftk_run
+lib/*
+bin/*
+tags
+.vscode
+.vs
+.lo
+awtk_config.pyc
+scripts/update_res_common.pyc
+infer-out
+args.txt
+log
+*.pyc
+__pycache__
+test.bin
+release
+event_log.bin
+res
