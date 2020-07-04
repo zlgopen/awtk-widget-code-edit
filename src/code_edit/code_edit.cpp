@@ -228,7 +228,6 @@ static ret_t code_edit_get_prop(widget_t* widget, const char* name, value_t* v) 
 }
 
 static ret_t code_edit_set_prop(widget_t* widget, const char* name, const value_t* v) {
-  code_edit_t* code_edit = CODE_EDIT(widget);
   return_value_if_fail(widget != NULL && name != NULL && v != NULL, RET_BAD_PARAMS);
 
   if (tk_str_eq(CODE_EDIT_PROP_LANG, name)) {
@@ -342,7 +341,8 @@ static ret_t code_edit_on_event(widget_t* widget, event_t* e) {
     default:
       break;
   }
-  return RET_OK;
+
+  return ret;
 }
 
 const char* s_code_edit_properties[] = {CODE_EDIT_PROP_LANG, CODE_EDIT_PROP_FILENAME,
@@ -376,11 +376,12 @@ static ret_t code_edit_on_remove_child(widget_t* widget, widget_t* child) {
   return RET_FAIL;
 }
 
-static widget_vtable_t s_code_edit_vtable = {};
+static widget_vtable_t s_code_edit_vtable;
 static const widget_vtable_t* code_edit_init_vtable(void) { 
   widget_vtable_t* vt = &s_code_edit_vtable;
 
   if (vt->size == 0) {
+    memset(vt, 0x00, sizeof(*vt));
     vt->size = sizeof(code_edit_t);
     vt->type = WIDGET_TYPE_CODE_EDIT;
     vt->clone_properties = s_code_edit_properties;

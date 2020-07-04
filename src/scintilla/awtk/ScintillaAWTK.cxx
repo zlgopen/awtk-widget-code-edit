@@ -67,11 +67,18 @@ ScintillaAWTK::ScintillaAWTK(WindowID wid) {
   this->wMain = wid;
   this->lastKeyDownConsumed = false;
   this->widget = WIDGET(wid);
+  this->bar_to_edit = FALSE;
+  this->idle_id = TK_INVALID_ID;
+  this->lastKeyDownConsumed = TRUE;
+
+  memset(timers, 0x00, sizeof(timers));
+
   Scintilla_LinkLexers();
 
   SSM(SCI_STYLECLEARALL, 0, 0);
   SSM(SCI_SETLEXER, SCLEX_CPP, 0);
 //  SSM(SCI_SETKEYWORDS, 0, (sptr_t) "int char xy_t wh_h");
+
   SSM(SCI_STYLESETFORE, SCE_C_COMMENT, 0x008000);
   SSM(SCI_STYLESETFORE, SCE_C_COMMENTLINE, 0x008000);
   SSM(SCI_STYLESETFORE, SCE_C_NUMBER, 0x808000);
@@ -82,6 +89,11 @@ ScintillaAWTK::ScintillaAWTK(WindowID wid) {
   SSM(SCI_SETMARGINTYPEN, 0, SC_MARGIN_NUMBER);
   SSM(SCI_SETMARGINWIDTHN, 0, 40);
   SSM(SCI_SETTABWIDTH, 4, 0);
+  SSM(SCI_STYLESETFONT, 0, (sptr_t)("default"));
+  SSM(SCI_STYLESETFONT, STYLE_DEFAULT, (sptr_t)("default"));
+  SSM(SCI_STYLESETSIZE, 0, 20);
+  SSM(SCI_STYLESETSIZE, STYLE_DEFAULT, 20);
+
 #if 0
   SSM(SCI_INSERTTEXT, 0, (sptr_t)
 "widget_t* code_edit_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h) {\n"
@@ -329,8 +341,6 @@ static int KeyTranslate(int keyIn) noexcept {
       return SCK_HOME;
     case TK_KEY_END:
       return SCK_END;
-    case TK_KEY_PRIOR:
-      return SCK_PRIOR;
     case TK_KEY_DELETE:
       return SCK_DELETE;
     case TK_KEY_INSERT:

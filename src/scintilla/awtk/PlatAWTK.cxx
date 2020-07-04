@@ -255,6 +255,13 @@ SurfaceImpl::SurfaceImpl() noexcept
   this->vg = NULL;
   this->canvas = NULL;
   this->widget = NULL;
+  this->ascent = 15;
+  this->descent = 5;
+  this->line_height = 20;
+  this->vg = NULL;
+  this->canvas = NULL;
+  this->pen_color = color_init(0, 0, 0, 0);
+
   str_init(&(this->str), 256);
   wstr_init(&(this->wstr), 256);
 }
@@ -549,8 +556,9 @@ void SurfaceImpl::SetFont(Font& font) {
     float_t lh = 0;
     vgcanvas_set_font(vg, NULL);
     vgcanvas_set_font_size(vg, 20);
+    canvas_set_font(this->canvas, NULL, 20);
 
-    vgcanvas_get_text_metrics(vg, &a, &d, &lh);
+    canvas_get_text_metrics(this->canvas, &a, &d, &lh);
     this->ascent = tk_abs(a);
     this->descent = tk_abs(d);
     this->line_height = lh;
@@ -640,7 +648,6 @@ XYPOSITION SurfaceImpl::WidthText(Font& font_, std::string_view text) {
 
 XYPOSITION SurfaceImpl::Ascent(Font& font_) {
   int a = this->ascent ? this->ascent : 15;
-  ;
   log_debug("a=%d\n", a);
 
   return a;

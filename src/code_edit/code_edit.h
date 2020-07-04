@@ -274,7 +274,7 @@ bool_t code_edit_can_paste(widget_t* widget);
 #define CODE_EDIT(widget) ((code_edit_t*)(code_edit_cast(WIDGET(widget))))
 
 /*public for subclass and runtime type check*/
-TK_EXTERN_VTABLE(code_edit);
+//TK_EXTERN_VTABLE(code_edit);
 
 END_C_DECLS
 
