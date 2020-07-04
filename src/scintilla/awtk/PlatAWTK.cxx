@@ -842,15 +842,21 @@ void ListBoxX::SetVisibleRows(int rows) {
 }
 
 int ListBoxX::GetVisibleRows() const {
+  return 0;
 }
 
 int ListBoxX::GetRowHeight() {
+  return 0;
 }
 
 PRectangle ListBoxX::GetDesiredRect() {
+  PRectangle r;
+
+  return r;
 }
 
 int ListBoxX::CaretFromEdge() {
+  return 0;
 }
 
 void ListBoxX::Clear() {
@@ -867,9 +873,11 @@ void ListBoxX::Select(int n) {
 }
 
 int ListBoxX::GetSelection() {
+  return 0;
 }
 
 int ListBoxX::Find(const char* prefix) {
+  return 0;
 }
 
 void ListBoxX::GetValue(int n, char* value, int len) {
@@ -922,9 +930,11 @@ class DynamicLibraryImpl : public DynamicLibrary {
 
   // Use g_module_symbol to get a pointer to the relevant function.
   Function FindFunction(const char* name) override {
+    return NULL;
   }
 
   bool IsValid() override {
+    return true;
   }
 };
 
@@ -941,9 +951,11 @@ ColourDesired Platform::ChromeHighlight() {
 }
 
 const char* Platform::DefaultFont() {
+  return NULL;
 }
 
 int Platform::DefaultFontSize() {
+  return 20;
 }
 
 unsigned int Platform::DoubleClickTime() {

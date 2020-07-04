@@ -67,12 +67,17 @@ if len(LANGUAGE) > 0:
     APP_DEFAULT_COUNTRY = lan[1]
 
 APP_CCFLAGS = ' -DLCD_WIDTH=' + LCD_WIDTH + ' -DLCD_HEIGHT=' + LCD_HEIGHT + ' ' 
-APP_CXXFLAGS = ' -std=c++17 -DSCI_LEXER -DAWTK=1 '
+APP_CXXFLAGS = '-DSCI_LEXER -DAWTK=1 '
 APP_CCFLAGS = APP_CCFLAGS + ' -DAPP_DEFAULT_FONT=\\\"' + APP_DEFAULT_FONT + '\\\" '
 APP_CCFLAGS = APP_CCFLAGS + ' -DAPP_THEME=\\\"' + APP_THEME + '\\\" ' 
 APP_CCFLAGS = APP_CCFLAGS + ' -DAPP_RES_ROOT=\\\"' + APP_RES_ROOT + '\\\" ' 
 APP_CCFLAGS = APP_CCFLAGS + ' -DAPP_DEFAULT_LANGUAGE=\\\"' + APP_DEFAULT_LANGUAGE + '\\\" ' 
 APP_CCFLAGS = APP_CCFLAGS + ' -DAPP_DEFAULT_COUNTRY=\\\"' + APP_DEFAULT_COUNTRY + '\\\" ' 
+
+if awtk.OS_NAME == 'Windows':
+  APP_CXXFLAGS += ' /std:c++17 '
+else:
+  APP_CXXFLAGS += ' -std=c++17 '
 
 APP_ROOT    = os.path.normpath(os.getcwd())
 APP_BIN_DIR = os.path.join(APP_ROOT, 'bin')
@@ -144,4 +149,7 @@ else:
     OS_SUBSYSTEM_CONSOLE=awtk.OS_SUBSYSTEM_CONSOLE,
     OS_SUBSYSTEM_WINDOWS=awtk.OS_SUBSYSTEM_WINDOWS)
 
-SConscript(['src/SConscript', 'demos/SConscript', 'tests/SConscript'])
+if awtk.OS_NAME == 'Windows':
+  SConscript(['src/SConscript', 'demos/SConscript'])
+else:
+  SConscript(['src/SConscript', 'demos/SConscript', 'tests/SConscript'])

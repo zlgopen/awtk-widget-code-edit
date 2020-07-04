@@ -376,22 +376,31 @@ static ret_t code_edit_on_remove_child(widget_t* widget, widget_t* child) {
   return RET_FAIL;
 }
 
-TK_DECL_VTABLE(code_edit) = {.size = sizeof(code_edit_t),
-                             .type = WIDGET_TYPE_CODE_EDIT,
-                             .clone_properties = s_code_edit_properties,
-                             .persistent_properties = s_code_edit_properties,
-                             .parent = TK_PARENT_VTABLE(widget),
-                             .create = code_edit_create,
-                             .on_paint_self = code_edit_on_paint_self,
-                             .set_prop = code_edit_set_prop,
-                             .get_prop = code_edit_get_prop,
-                             .on_event = code_edit_on_event,
-                             .on_add_child = code_edit_on_add_child,
-                             .on_remove_child = code_edit_on_remove_child,
-                             .on_destroy = code_edit_on_destroy};
+static widget_vtable_t s_code_edit_vtable = {};
+static const widget_vtable_t* code_edit_init_vtable(void) { 
+  widget_vtable_t* vt = &s_code_edit_vtable;
+
+  if (vt->size == 0) {
+    vt->size = sizeof(code_edit_t);
+    vt->type = WIDGET_TYPE_CODE_EDIT;
+    vt->clone_properties = s_code_edit_properties;
+    vt->persistent_properties = s_code_edit_properties;
+    vt->parent = TK_PARENT_VTABLE(widget);
+    vt->create = code_edit_create;
+    vt->on_paint_self = code_edit_on_paint_self;
+    vt->set_prop = code_edit_set_prop;
+    vt->get_prop = code_edit_get_prop;
+    vt->on_event = code_edit_on_event;
+    vt->on_add_child = code_edit_on_add_child;
+    vt->on_remove_child = code_edit_on_remove_child;
+    vt->on_destroy = code_edit_on_destroy;
+  }
+
+  return vt;
+}
 
 widget_t* code_edit_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h) {
-  widget_t* widget = widget_create(parent, TK_REF_VTABLE(code_edit), x, y, w, h);
+  widget_t* widget = widget_create(parent, code_edit_init_vtable(), x, y, w, h);
   code_edit_t* code_edit = CODE_EDIT(widget);
   return_value_if_fail(code_edit != NULL, NULL);
 
