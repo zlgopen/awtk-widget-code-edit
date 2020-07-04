@@ -1,5 +1,5 @@
 <window theme="main" >
-  <code_edit x="40" y="40" w="-80" h="-80" lang="c">
+  <code_edit x="40" y="40" w="-80" h="-80" lang="c" code_theme="stylers">
    <scroll_bar_d name="vbar" x="right" y="0" w="14" h="100%" value="0"/>
   </code_edit>
 </window>

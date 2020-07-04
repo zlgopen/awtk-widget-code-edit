@@ -22,9 +22,6 @@ widget_t* code_edit_create_internal(widget_t* parent, xy_t x, xy_t y, wh_t w, wh
   code_edit_t* code_edit = CODE_EDIT(widget);
   return_value_if_fail(code_edit != NULL, NULL);
 
-  code_edit->lang = tk_strdup("cpp");
-  code_edit->code_theme = tk_strdup("khaki");
-
   return widget;
 }
 

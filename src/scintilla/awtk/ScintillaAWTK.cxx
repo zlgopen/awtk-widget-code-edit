@@ -93,23 +93,6 @@ ScintillaAWTK::ScintillaAWTK(WindowID wid) {
   SSM(SCI_STYLESETFONT, STYLE_DEFAULT, (sptr_t)("default"));
   SSM(SCI_STYLESETSIZE, 0, 20);
   SSM(SCI_STYLESETSIZE, STYLE_DEFAULT, 20);
-
-#if 0
-  SSM(SCI_INSERTTEXT, 0, (sptr_t)
-"widget_t* code_edit_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h) {\n"
-"  widget_t* widget = widget_create(parent, TK_REF_VTABLE(code_edit), x, y, w, h);\n"
-"  code_edit_t* code_edit = CODE_EDIT(widget);\n"
-"  return_value_if_fail(code_edit != NULL, NULL);\n"
-"\n"
-"  code_edit->lang = tk_strdup(\"c\");\n"
-"  code_edit->impl = new ScintillaAWTK(widget);\n"
-"\n"
-"  return widget;\n"
-"}\n"
-   );
-#else
-  SSM(SCI_INSERTTEXT, 0, (sptr_t) "int a");
-#endif
   SSM(SCI_SETCARETPERIOD, 500, 0);
   SSM(SCI_SETFOCUS, 1, 0);
 
