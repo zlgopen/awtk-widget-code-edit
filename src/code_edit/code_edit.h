@@ -274,7 +274,14 @@ bool_t code_edit_can_paste(widget_t* widget);
 #define CODE_EDIT(widget) ((code_edit_t*)(code_edit_cast(WIDGET(widget))))
 
 /*public for subclass and runtime type check*/
-//TK_EXTERN_VTABLE(code_edit);
+TK_EXTERN_VTABLE(code_edit);
+
+ret_t code_edit_on_destroy(widget_t* widget);
+ret_t code_edit_on_event(widget_t* widget, event_t* e);
+ret_t code_edit_on_paint_self(widget_t* widget, canvas_t* c);
+ret_t code_edit_on_add_child(widget_t* widget, widget_t* child);
+ret_t code_edit_get_prop(widget_t* widget, const char* name, value_t* v);
+ret_t code_edit_set_prop(widget_t* widget, const char* name, const value_t* v);
 
 END_C_DECLS
 

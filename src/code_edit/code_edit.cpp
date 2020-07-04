@@ -125,11 +125,11 @@ static ret_t code_edit_on_word_style(void* ctx, code_style_t* style) {
 }
 
 static ret_t code_edit_on_widget_style(void* ctx, code_style_t* style) {
-  if (style->id ==STYLE_DEFAULT) {
+  if (style->id == STYLE_DEFAULT) {
     code_edit_on_word_style(ctx, style);
     style->id = 0;
     code_edit_on_word_style(ctx, style);
-  } else if(style->id != 0) {
+  } else if (style->id != 0) {
     code_edit_on_word_style(ctx, style);
   }
   return RET_OK;
@@ -206,7 +206,7 @@ ret_t code_edit_set_show_line_number(widget_t* widget, bool_t show_line_number) 
   return RET_OK;
 }
 
-static ret_t code_edit_get_prop(widget_t* widget, const char* name, value_t* v) {
+ret_t code_edit_get_prop(widget_t* widget, const char* name, value_t* v) {
   code_edit_t* code_edit = CODE_EDIT(widget);
   return_value_if_fail(code_edit != NULL && name != NULL && v != NULL, RET_BAD_PARAMS);
 
@@ -227,7 +227,7 @@ static ret_t code_edit_get_prop(widget_t* widget, const char* name, value_t* v) 
   return RET_NOT_FOUND;
 }
 
-static ret_t code_edit_set_prop(widget_t* widget, const char* name, const value_t* v) {
+ret_t code_edit_set_prop(widget_t* widget, const char* name, const value_t* v) {
   return_value_if_fail(widget != NULL && name != NULL && v != NULL, RET_BAD_PARAMS);
 
   if (tk_str_eq(CODE_EDIT_PROP_LANG, name)) {
@@ -247,7 +247,7 @@ static ret_t code_edit_set_prop(widget_t* widget, const char* name, const value_
   return RET_NOT_FOUND;
 }
 
-static ret_t code_edit_on_destroy(widget_t* widget) {
+ret_t code_edit_on_destroy(widget_t* widget) {
   code_edit_t* code_edit = CODE_EDIT(widget);
   ScintillaAWTK* impl = static_cast<ScintillaAWTK*>(code_edit->impl);
   return_value_if_fail(widget != NULL && code_edit != NULL, RET_BAD_PARAMS);
@@ -262,7 +262,7 @@ static ret_t code_edit_on_destroy(widget_t* widget) {
   return RET_OK;
 }
 
-static ret_t code_edit_on_paint_self(widget_t* widget, canvas_t* c) {
+ret_t code_edit_on_paint_self(widget_t* widget, canvas_t* c) {
   point_t p = {0, 0};
   rect_t save_r = {0, 0, 0, 0};
   rect_t clip_r = {0, 0, 0, 0};
@@ -287,7 +287,7 @@ static ret_t code_edit_on_paint_self(widget_t* widget, canvas_t* c) {
   return RET_OK;
 }
 
-static ret_t code_edit_on_event(widget_t* widget, event_t* e) {
+ret_t code_edit_on_event(widget_t* widget, event_t* e) {
   ret_t ret = RET_STOP;
   code_edit_t* code_edit = CODE_EDIT(widget);
   ScintillaAWTK* impl = static_cast<ScintillaAWTK*>(code_edit->impl);
@@ -345,9 +345,6 @@ static ret_t code_edit_on_event(widget_t* widget, event_t* e) {
   return ret;
 }
 
-const char* s_code_edit_properties[] = {CODE_EDIT_PROP_LANG, CODE_EDIT_PROP_FILENAME,
-                                        CODE_EDIT_PROP_SHOW_LINE_NUMBER, NULL};
-
 static ret_t code_edit_on_scroll_bar_changed(void* ctx, event_t* e) {
   widget_t* widget = WIDGET(ctx);
   widget_t* target = WIDGET(e->target);
@@ -360,7 +357,7 @@ static ret_t code_edit_on_scroll_bar_changed(void* ctx, event_t* e) {
   return RET_OK;
 }
 
-static ret_t code_edit_on_add_child(widget_t* widget, widget_t* child) {
+ret_t code_edit_on_add_child(widget_t* widget, widget_t* child) {
   const char* type = widget_get_type(child);
 
   if (tk_str_eq(type, WIDGET_TYPE_SCROLL_BAR_MOBILE) ||
@@ -372,48 +369,13 @@ static ret_t code_edit_on_add_child(widget_t* widget, widget_t* child) {
   return RET_FAIL;
 }
 
-static ret_t code_edit_on_remove_child(widget_t* widget, widget_t* child) {
-  return RET_FAIL;
-}
-
-static widget_vtable_t s_code_edit_vtable;
-static const widget_vtable_t* code_edit_init_vtable(void) { 
-  widget_vtable_t* vt = &s_code_edit_vtable;
-
-  if (vt->size == 0) {
-    memset(vt, 0x00, sizeof(*vt));
-    vt->size = sizeof(code_edit_t);
-    vt->type = WIDGET_TYPE_CODE_EDIT;
-    vt->clone_properties = s_code_edit_properties;
-    vt->persistent_properties = s_code_edit_properties;
-    vt->parent = TK_PARENT_VTABLE(widget);
-    vt->create = code_edit_create;
-    vt->on_paint_self = code_edit_on_paint_self;
-    vt->set_prop = code_edit_set_prop;
-    vt->get_prop = code_edit_get_prop;
-    vt->on_event = code_edit_on_event;
-    vt->on_add_child = code_edit_on_add_child;
-    vt->on_remove_child = code_edit_on_remove_child;
-    vt->on_destroy = code_edit_on_destroy;
-  }
-
-  return vt;
-}
+extern "C" widget_t* code_edit_create_internal(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h);
 
 widget_t* code_edit_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h) {
-  widget_t* widget = widget_create(parent, code_edit_init_vtable(), x, y, w, h);
+  widget_t* widget = code_edit_create_internal(parent, x, y, w, h);
   code_edit_t* code_edit = CODE_EDIT(widget);
   return_value_if_fail(code_edit != NULL, NULL);
-
-  code_edit->lang = tk_strdup("cpp");
-  code_edit->code_theme = tk_strdup("khaki");
-  code_edit->impl = new ScintillaAWTK(widget);
-
-  return widget;
-}
-
-widget_t* code_edit_cast(widget_t* widget) {
-  return_value_if_fail(WIDGET_IS_INSTANCE_OF(widget, code_edit), NULL);
+  code_edit->impl = new (std::nothrow) ScintillaAWTK(widget);
 
   return widget;
 }
