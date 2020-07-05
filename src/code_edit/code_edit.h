@@ -64,6 +64,7 @@ typedef struct _code_edit_t {
 
   /*private*/
   void* impl;
+  str_t text;
 } code_edit_t;
 
 /**

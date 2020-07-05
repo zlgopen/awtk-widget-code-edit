@@ -89,6 +89,8 @@ using Scintilla::ScintillaAWTK;
 using Scintilla::Surface;
 
 #define SSM(m, w, l) impl->DefWndProc(m, w, l)
+static ret_t code_edit_get_text(widget_t* widget, value_t* v);
+static ret_t code_edit_set_text(widget_t* widget, const value_t* v);
 
 static ret_t code_edit_on_word_style(void* ctx, code_style_t* style) {
   ScintillaAWTK* impl = NULL;
@@ -213,6 +215,9 @@ ret_t code_edit_get_prop(widget_t* widget, const char* name, value_t* v) {
   if (tk_str_eq(CODE_EDIT_PROP_LANG, name)) {
     value_set_str(v, code_edit->lang);
     return RET_OK;
+  } else if (tk_str_eq(WIDGET_PROP_TEXT, name) || tk_str_eq(WIDGET_PROP_VALUE, name)) {
+    code_edit_get_text(widget, v);
+    return RET_OK;
   } else if (tk_str_eq(CODE_EDIT_PROP_CODE_THEME, name)) {
     value_set_str(v, code_edit->code_theme);
     return RET_OK;
@@ -232,6 +237,9 @@ ret_t code_edit_set_prop(widget_t* widget, const char* name, const value_t* v) {
 
   if (tk_str_eq(CODE_EDIT_PROP_LANG, name)) {
     code_edit_set_lang(widget, value_str(v));
+    return RET_OK;
+  } else if (tk_str_eq(WIDGET_PROP_TEXT, name) || tk_str_eq(WIDGET_PROP_VALUE, name)) {
+    code_edit_set_text(widget, v);
     return RET_OK;
   } else if (tk_str_eq(CODE_EDIT_PROP_CODE_THEME, name)) {
     code_edit_set_code_theme(widget, value_str(v));
@@ -255,6 +263,8 @@ ret_t code_edit_on_destroy(widget_t* widget) {
   TKMEM_FREE(code_edit->lang);
   TKMEM_FREE(code_edit->code_theme);
   TKMEM_FREE(code_edit->filename);
+  str_reset(&(code_edit->text));
+
   delete impl;
 
   code_edit->impl = NULL;
@@ -401,6 +411,45 @@ static bool_t code_edit_cmd_bool_void(widget_t* widget, int cmd) {
 
   return SSM(cmd, 0, 0);
 }
+
+static ret_t code_edit_get_text(widget_t* widget, value_t* v) {
+  uint32_t len = 0;
+  str_t* str = NULL;
+  ScintillaAWTK* impl = NULL;
+  code_edit_t* code_edit = CODE_EDIT(widget);
+  return_value_if_fail(code_edit != NULL, RET_BAD_PARAMS);
+  impl = static_cast<ScintillaAWTK*>(code_edit->impl);
+  return_value_if_fail(impl != NULL, RET_BAD_PARAMS);
+
+  value_set_str(v, NULL);
+  len = SSM(SCI_GETTEXTLENGTH, 0, 0);
+  return_value_if_fail(len >= 0, RET_FAIL);
+  str = &(code_edit->text);
+  return_value_if_fail(str_extend(str, len + 1) == RET_OK, RET_FAIL);
+
+  str_set(str, "");
+  SSM(SCI_GETTEXT, len, (sptr_t)(str->str));
+
+  return RET_OK;
+}
+
+static ret_t code_edit_set_text(widget_t* widget, const value_t* v) {
+  uint32_t len = 0;
+  str_t* str = NULL;
+  ScintillaAWTK* impl = NULL;
+  code_edit_t* code_edit = CODE_EDIT(widget);
+  return_value_if_fail(code_edit != NULL, RET_BAD_PARAMS);
+  impl = static_cast<ScintillaAWTK*>(code_edit->impl);
+  return_value_if_fail(impl != NULL, RET_BAD_PARAMS);
+
+  str = &(code_edit->text);
+  return_value_if_fail(str_from_value(str, v) == RET_OK, RET_FAIL);
+
+  SSM(SCI_SETTEXT, 0, (sptr_t)(str->str));
+
+  return RET_OK;
+}
+
 
 ret_t code_edit_redo(widget_t* widget) {
   return code_edit_cmd_void_void(widget, SCI_REDO);

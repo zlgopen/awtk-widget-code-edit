@@ -22,6 +22,8 @@ widget_t* code_edit_create_internal(widget_t* parent, xy_t x, xy_t y, wh_t w, wh
   code_edit_t* code_edit = CODE_EDIT(widget);
   return_value_if_fail(code_edit != NULL, NULL);
 
+  str_init(&(code_edit->text), 0);
+
   return widget;
 }
 
