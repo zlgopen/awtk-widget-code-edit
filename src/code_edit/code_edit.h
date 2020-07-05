@@ -61,7 +61,7 @@ typedef struct _code_edit_t {
    * 是否显示行号。
    */
   bool_t show_line_number;
-  
+
   /**
    * @property {bool_t} readonly
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
@@ -283,6 +283,29 @@ bool_t code_edit_can_cut(widget_t* widget);
  */
 bool_t code_edit_can_paste(widget_t* widget);
 
+/**
+ * @method code_edit_save
+ * save
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {const char*} filename 文件名。
+ * @param {bool_t} with_utf8_bom bom
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t code_edit_save(widget_t* widget, const char* filename, bool_t with_utf8_bom);
+
+/**
+ * @method code_edit_load
+ * load
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {const char*} filename 文件名。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t code_edit_load(widget_t* widget, const char* filename);
+
 #define CODE_EDIT_PROP_LANG "lang"
 #define CODE_EDIT_PROP_CODE_THEME "theme"
 #define CODE_EDIT_PROP_FILENAME "filename"
@@ -295,6 +318,7 @@ bool_t code_edit_can_paste(widget_t* widget);
 /*public for subclass and runtime type check*/
 TK_EXTERN_VTABLE(code_edit);
 
+/*public for vtable*/
 ret_t code_edit_on_destroy(widget_t* widget);
 ret_t code_edit_on_event(widget_t* widget, event_t* e);
 ret_t code_edit_on_paint_self(widget_t* widget, canvas_t* c);

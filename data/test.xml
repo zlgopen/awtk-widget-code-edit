@@ -1,12 +1,12 @@
-<window theme="main" >
-  <code_edit name="code" x="10" y="10" w="-20" h="-108" code_theme="stylers" filename="data/test.c">
+﻿<window theme="main" >
+  <code_edit name="code" x="10" y="10" w="-20" h="-108" lang="c" code_theme="stylers" filename="test.xml">
    <scroll_bar_d name="vbar" x="right" y="0" w="14" h="100%" value="0"/>
   </code_edit>
 
   <view x="10" y="b:50" w="-20" h="40" children_layout="default(r=1,c=4,s=5,m=2)">
     <check_button name="readonly" text="Readonly" />
     <check_button name="utf8_bom" text="With UTF8 BOM" />
-    <check_button name="show_line_number" text="Show Line Number" value="true"/>
+    <check_button name="show_line_number" text="Show Line Number" />
     <combo_box name="theme" options="stylers;khaki;Monokai" text="stylers"/>
   </view>
 

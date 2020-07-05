@@ -19,6 +19,7 @@
  *
  */
 
+#include "tkc/fs.h"
 #include "tkc/mem.h"
 #include "tkc/utils.h"
 #include "code_edit.h"
@@ -188,7 +189,10 @@ ret_t code_edit_set_filename(widget_t* widget, const char* filename) {
   code_edit_t* code_edit = CODE_EDIT(widget);
   return_value_if_fail(code_edit != NULL, RET_BAD_PARAMS);
 
-  code_edit->filename = tk_str_copy(code_edit->filename, filename);
+  if (!tk_str_eq(code_edit->filename, filename)) {
+    code_edit->filename = tk_str_copy(code_edit->filename, filename);
+    code_edit_load(widget, NULL);
+  }
 
   return RET_OK;
 }
@@ -203,7 +207,7 @@ ret_t code_edit_set_show_line_number(widget_t* widget, bool_t show_line_number) 
   code_edit->show_line_number = show_line_number;
 
   SSM(SCI_SETMARGINTYPEN, 0, SC_MARGIN_NUMBER);
-  SSM(SCI_SETMARGINWIDTHN, 0, show_line_number ? 40 : 10);
+  SSM(SCI_SETMARGINWIDTHN, 0, show_line_number ? 40 : 0);
 
   return RET_OK;
 }
@@ -318,7 +322,7 @@ ret_t code_edit_on_paint_self(widget_t* widget, canvas_t* c) {
 }
 
 ret_t code_edit_on_event(widget_t* widget, event_t* e) {
-  ret_t ret = RET_STOP;
+  ret_t ret = RET_OK;
   code_edit_t* code_edit = CODE_EDIT(widget);
   ScintillaAWTK* impl = static_cast<ScintillaAWTK*>(code_edit->impl);
   return_value_if_fail(impl != NULL, RET_BAD_PARAMS);
@@ -470,7 +474,6 @@ static ret_t code_edit_set_text(widget_t* widget, const value_t* v) {
   return RET_OK;
 }
 
-
 ret_t code_edit_redo(widget_t* widget) {
   return code_edit_cmd_void_void(widget, SCI_REDO);
 }
@@ -521,4 +524,66 @@ bool_t code_edit_can_cut(widget_t* widget) {
 
 bool_t code_edit_can_paste(widget_t* widget) {
   return code_edit_cmd_bool_void(widget, SCI_CANPASTE);
+}
+
+static const uint8_t s_utf8_bom[3] = {0xEF, 0xBB, 0xBF};
+
+ret_t code_edit_save(widget_t* widget, const char* filename, bool_t with_utf8_bom) {
+  value_t v;
+  int32_t size = 0;
+  fs_file_t* fp = NULL;
+  const char* str = NULL;
+  code_edit_t* code_edit = CODE_EDIT(widget);
+  return_value_if_fail(code_edit != NULL, RET_BAD_PARAMS);
+  filename = filename != NULL ? filename : code_edit->filename;
+  return_value_if_fail(filename != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(code_edit_get_text(widget, &v) == RET_OK, RET_BAD_PARAMS);
+
+  str = value_str(&v);
+  return_value_if_fail(str != NULL, RET_BAD_PARAMS);
+
+  fp = fs_open_file(os_fs(), filename, "w+");
+  return_value_if_fail(fp != NULL, RET_FAIL);
+
+  if (with_utf8_bom) {
+    ENSURE(fs_file_write(fp, s_utf8_bom, sizeof(s_utf8_bom)) == sizeof(s_utf8_bom));
+  }
+  size = strlen(str);
+  ENSURE(fs_file_write(fp, str, size) == size);
+  fs_file_close(fp);
+
+  return RET_OK;
+}
+
+ret_t code_edit_load(widget_t* widget, const char* filename) {
+  value_t v;
+  uint32_t size = 0;
+  const char* str = NULL;
+  const char* data = NULL;
+  code_edit_t* code_edit = CODE_EDIT(widget);
+  return_value_if_fail(code_edit != NULL, RET_BAD_PARAMS);
+  filename = filename != NULL ? filename : code_edit->filename;
+  return_value_if_fail(filename != NULL, RET_BAD_PARAMS);
+
+  data = (const char*)file_read(filename, &size);
+  return_value_if_fail(data != NULL, RET_BAD_PARAMS);
+
+  if (memcmp(data, s_utf8_bom, sizeof(s_utf8_bom)) == 0) {
+    str = data + 3;
+  } else {
+    str = data;
+  }
+
+  value_set_str(&v, str);
+  if (code_edit_set_text(widget, &v) == RET_OK) {
+    const char* lang = strrchr(filename, '.');
+    if (lang != NULL) {
+      lang++;
+      code_edit_set_lang(widget, lang);
+    }
+  }
+
+  TKMEM_FREE(data);
+
+  return RET_OK;
 }
