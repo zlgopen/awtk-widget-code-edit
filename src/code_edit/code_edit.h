@@ -61,6 +61,13 @@ typedef struct _code_edit_t {
    * 是否显示行号。
    */
   bool_t show_line_number;
+  
+  /**
+   * @property {bool_t} readonly
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 是否显示行号。
+   */
+  bool_t readonly;
 
   /*private*/
   void* impl;
@@ -134,6 +141,17 @@ ret_t code_edit_set_filename(widget_t* widget, const char* filename);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t code_edit_set_show_line_number(widget_t* widget, bool_t show_line_number);
+
+/**
+ * @method code_edit_set_readonly
+ * 设置 是否显示行号。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {bool_t} readonly 是否显示行号。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t code_edit_set_readonly(widget_t* widget, bool_t readonly);
 
 /**
  * @method code_edit_redo

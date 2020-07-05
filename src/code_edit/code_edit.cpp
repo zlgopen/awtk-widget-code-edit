@@ -208,6 +208,20 @@ ret_t code_edit_set_show_line_number(widget_t* widget, bool_t show_line_number) 
   return RET_OK;
 }
 
+ret_t code_edit_set_readonly(widget_t* widget, bool_t readonly) {
+  ScintillaAWTK* impl = NULL;
+  code_edit_t* code_edit = CODE_EDIT(widget);
+  return_value_if_fail(code_edit != NULL, RET_BAD_PARAMS);
+  impl = static_cast<ScintillaAWTK*>(code_edit->impl);
+  return_value_if_fail(impl != NULL, RET_BAD_PARAMS);
+
+  code_edit->readonly = readonly;
+
+  SSM(SCI_SETREADONLY, readonly, 0);
+
+  return RET_OK;
+}
+
 ret_t code_edit_get_prop(widget_t* widget, const char* name, value_t* v) {
   code_edit_t* code_edit = CODE_EDIT(widget);
   return_value_if_fail(code_edit != NULL && name != NULL && v != NULL, RET_BAD_PARAMS);
@@ -226,6 +240,9 @@ ret_t code_edit_get_prop(widget_t* widget, const char* name, value_t* v) {
     return RET_OK;
   } else if (tk_str_eq(CODE_EDIT_PROP_SHOW_LINE_NUMBER, name)) {
     value_set_bool(v, code_edit->show_line_number);
+    return RET_OK;
+  } else if (tk_str_eq(WIDGET_PROP_READONLY, name)) {
+    value_set_bool(v, code_edit->readonly);
     return RET_OK;
   }
 
@@ -249,6 +266,9 @@ ret_t code_edit_set_prop(widget_t* widget, const char* name, const value_t* v) {
     return RET_OK;
   } else if (tk_str_eq(CODE_EDIT_PROP_SHOW_LINE_NUMBER, name)) {
     code_edit_set_show_line_number(widget, value_bool(v));
+    return RET_OK;
+  } else if (tk_str_eq(WIDGET_PROP_READONLY, name)) {
+    code_edit_set_readonly(widget, value_bool(v));
     return RET_OK;
   }
 
