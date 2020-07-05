@@ -173,6 +173,29 @@
             "type": "widget_t*",
             "name": "widget",
             "desc": "widget对象。"
+          },
+          {
+            "type": "bool_t",
+            "name": "readonly",
+            "desc": "是否显示行号。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 是否显示行号。",
+        "name": "code_edit_set_readonly",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
           }
         ],
         "annotation": {
@@ -400,6 +423,57 @@
           "type": "bool_t",
           "desc": "返回TRUE表示能，否则表示不能。"
         }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "filename",
+            "desc": "文件名。"
+          },
+          {
+            "type": "bool_t",
+            "name": "with_utf8_bom",
+            "desc": "bom"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "save",
+        "name": "code_edit_save",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "filename",
+            "desc": "文件名。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "load",
+        "name": "code_edit_load",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
       }
     ],
     "events": [],
@@ -445,6 +519,19 @@
       },
       {
         "name": "show_line_number",
+        "desc": "是否显示行号。",
+        "type": "bool_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "readonly",
         "desc": "是否显示行号。",
         "type": "bool_t",
         "annotation": {
