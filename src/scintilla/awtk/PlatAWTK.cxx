@@ -42,16 +42,6 @@ static color_t color_from_sci(ColourDesired from) {
 
 namespace {
 
-widget_t* WindowFromWidget(widget_t* w) noexcept {
-  return widget_get_window(w);
-}
-
-widget_t* PWidget(WindowID wid) noexcept {
-  return static_cast<widget_t*>(wid);
-}
-
-enum encodingType { singleByte, UTF8, dbcs };
-
 // Holds a PangoFontDescription*.
 class FontHandle {
  public:
@@ -86,10 +76,6 @@ FontHandle* FontHandle::CreateNewFont(const FontParameters& fp) {
 // X has a 16 bit coordinate space, so stop drawing here to avoid wrapping
 const int maxCoordinate = 32000;
 
-FontHandle* PFont(const Font& f) noexcept {
-  return static_cast<FontHandle*>(f.GetID());
-}
-
 }  // namespace
 
 Font::Font() noexcept : fid(nullptr) {
@@ -113,7 +99,6 @@ namespace Scintilla {
 
 // SurfaceID is a cairo_t*
 class SurfaceImpl : public Surface {
-  encodingType et;
   int x;
   int y;
   bool inited;
@@ -251,7 +236,7 @@ void SurfaceImpl::SetConverter(int characterSet_) {
 }
 
 SurfaceImpl::SurfaceImpl() noexcept
-    : et(singleByte), x(0), y(0), inited(false), createdGC(false), characterSet(-1) {
+    : x(0), y(0), inited(false), createdGC(false), characterSet(-1) {
   this->vg = NULL;
   this->canvas = NULL;
   this->widget = NULL;
@@ -318,9 +303,6 @@ void SurfaceImpl::InitPixMap(int width, int height, Surface* surface_, WindowID 
   PLATFORM_ASSERT(surface_);
   PLATFORM_ASSERT(wid);
   Release();
-
-  SurfaceImpl* surfImpl = static_cast<SurfaceImpl*>(surface_);
-  et = surfImpl->et;
 }
 
 void SurfaceImpl::PenColour(ColourDesired fore) {
@@ -345,15 +327,6 @@ void SurfaceImpl::MoveTo(int x, int y) {
   int oy = this->canvas->oy;
 
   vgcanvas_move_to(vg, x + ox, y + oy);
-}
-
-static int Delta(int difference) noexcept {
-  if (difference < 0)
-    return -1;
-  else if (difference > 0)
-    return 1;
-  else
-    return 0;
 }
 
 void SurfaceImpl::LineTo(int x, int y) {
@@ -414,9 +387,6 @@ void SurfaceImpl::FillRectangle(PRectangle rc, ColourDesired back) {
     return;
   }
 
-  if(w > 200 && h > 200) {
-  log_debug("bg\n");
-  }
   rc.left = std::round(rc.left);
   rc.right = std::round(rc.right);
 
@@ -494,57 +464,6 @@ void SurfaceImpl::Copy(PRectangle rc, Point from, Surface& surfaceSource) {
 
 std::unique_ptr<IScreenLineLayout> SurfaceImpl::Layout(const IScreenLine*) {
   return {};
-}
-
-std::string UTF8FromLatin1(std::string_view text) {
-  std::string utfForm(text.length() * 2 + 1, '\0');
-  size_t lenU = 0;
-  for (char ch : text) {
-    const unsigned char uch = ch;
-    if (uch < 0x80) {
-      utfForm[lenU++] = uch;
-    } else {
-      utfForm[lenU++] = static_cast<char>(0xC0 | (uch >> 6));
-      utfForm[lenU++] = static_cast<char>(0x80 | (uch & 0x3f));
-    }
-  }
-  utfForm.resize(lenU);
-  return utfForm;
-}
-
-static std::string UTF8FromIconv(const Converter& conv, std::string_view text) {
-  if (conv) {
-    std::string utfForm(text.length() * 3 + 1, '\0');
-    char* pin = const_cast<char*>(text.data());
-    uint32_t inLeft = text.length();
-    char* putf = &utfForm[0];
-    char* pout = putf;
-    uint32_t outLeft = text.length() * 3 + 1;
-    const uint32_t conversions = conv.Convert(&pin, &inLeft, &pout, &outLeft);
-    if (conversions != sizeFailure) {
-      *pout = '\0';
-      utfForm.resize(pout - putf);
-      return utfForm;
-    }
-  }
-  return std::string();
-}
-
-// Work out how many bytes are in a character by trying to convert using iconv,
-// returning the first length that succeeds.
-static size_t MultiByteLenFromIconv(const Converter& conv, const char* s, size_t len) {
-  for (size_t lenMB = 1; (lenMB < 4) && (lenMB <= len); lenMB++) {
-    char wcForm[2];
-    char* pin = const_cast<char*>(s);
-    uint32_t inLeft = lenMB;
-    char* pout = wcForm;
-    uint32_t outLeft = 2;
-    const uint32_t conversions = conv.Convert(&pin, &inLeft, &pout, &outLeft);
-    if (conversions != sizeFailure) {
-      return lenMB;
-    }
-  }
-  return 1;
 }
 
 void SurfaceImpl::SetFont(Font& font) {
