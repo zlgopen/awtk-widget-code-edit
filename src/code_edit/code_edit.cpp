@@ -153,7 +153,7 @@ static ret_t code_edit_apply_lang(widget_t* widget) {
     return_value_if_fail(v >= 0, RET_BAD_PARAMS);
     SSM(SCI_SETLEXER, v, 0);
     SSM(SCI_STYLECLEARALL, 0, 0);
-    
+
     info = assets_manager_ref(am, ASSET_TYPE_XML, code_edit->code_theme);
     if (info != NULL) {
       code_theme_t theme;
@@ -162,6 +162,7 @@ static ret_t code_edit_apply_lang(widget_t* widget) {
       code_theme_load(&theme, (const char*)(info->data), info->size);
       code_theme_deinit(&theme);
       assets_manager_unref(am, info);
+      SSM(SCI_SETZOOM, 5, 0);
     }
   }
 
@@ -227,6 +228,20 @@ ret_t code_edit_set_readonly(widget_t* widget, bool_t readonly) {
   return RET_OK;
 }
 
+ret_t code_edit_set_tab_width(widget_t* widget, uint32_t tab_width) {
+  ScintillaAWTK* impl = NULL;
+  code_edit_t* code_edit = CODE_EDIT(widget);
+  return_value_if_fail(code_edit != NULL, RET_BAD_PARAMS);
+  impl = static_cast<ScintillaAWTK*>(code_edit->impl);
+  return_value_if_fail(impl != NULL, RET_BAD_PARAMS);
+
+  code_edit->tab_width = tab_width;
+
+  SSM(SCI_SETTABWIDTH, tab_width, 0);
+
+  return RET_OK;
+}
+
 ret_t code_edit_get_prop(widget_t* widget, const char* name, value_t* v) {
   code_edit_t* code_edit = CODE_EDIT(widget);
   return_value_if_fail(code_edit != NULL && name != NULL && v != NULL, RET_BAD_PARAMS);
@@ -245,6 +260,9 @@ ret_t code_edit_get_prop(widget_t* widget, const char* name, value_t* v) {
     return RET_OK;
   } else if (tk_str_eq(CODE_EDIT_PROP_SHOW_LINE_NUMBER, name)) {
     value_set_bool(v, code_edit->show_line_number);
+    return RET_OK;
+  } else if (tk_str_eq(CODE_EDIT_PROP_TAB_WIDTH, name)) {
+    value_set_uint32(v, code_edit->tab_width);
     return RET_OK;
   } else if (tk_str_eq(WIDGET_PROP_READONLY, name)) {
     value_set_bool(v, code_edit->readonly);
@@ -271,6 +289,9 @@ ret_t code_edit_set_prop(widget_t* widget, const char* name, const value_t* v) {
     return RET_OK;
   } else if (tk_str_eq(CODE_EDIT_PROP_SHOW_LINE_NUMBER, name)) {
     code_edit_set_show_line_number(widget, value_bool(v));
+    return RET_OK;
+  } else if (tk_str_eq(CODE_EDIT_PROP_TAB_WIDTH, name)) {
+    code_edit_set_tab_width(widget, value_uint32(v));
     return RET_OK;
   } else if (tk_str_eq(WIDGET_PROP_READONLY, name)) {
     code_edit_set_readonly(widget, value_bool(v));
@@ -411,6 +432,7 @@ widget_t* code_edit_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h) {
   code_edit_t* code_edit = CODE_EDIT(widget);
   return_value_if_fail(code_edit != NULL, NULL);
   code_edit->impl = new (std::nothrow) ScintillaAWTK(widget);
+  code_edit_set_tab_width(widget, 4);
 
   return widget;
 }

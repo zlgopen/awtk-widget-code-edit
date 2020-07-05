@@ -32,6 +32,11 @@ TEST(code_edit, basic) {
   ASSERT_EQ(widget_set_prop_str(w, CODE_EDIT_PROP_FILENAME, "test.c"), RET_OK);
   ASSERT_STREQ(widget_get_prop_str(w, CODE_EDIT_PROP_FILENAME, NULL), "test.c");
   ASSERT_STREQ(code_edit->filename, "test.c");
+  
+  ASSERT_EQ(code_edit->tab_width, 4);
+  ASSERT_EQ(widget_set_prop_int(w, CODE_EDIT_PROP_TAB_WIDTH, 2), RET_OK);
+  ASSERT_EQ(widget_get_prop_int(w, CODE_EDIT_PROP_TAB_WIDTH, 0), 2);
+  ASSERT_EQ(code_edit->tab_width, 2);
 
   widget_destroy(w);
 }

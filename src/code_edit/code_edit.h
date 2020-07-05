@@ -68,6 +68,13 @@ typedef struct _code_edit_t {
    * 是否显示行号。
    */
   bool_t readonly;
+  
+  /**
+   * @property {uint32_t} tab_width
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * tab的宽度。
+   */
+  uint32_t tab_width;
 
   /*private*/
   void* impl;
@@ -152,6 +159,17 @@ ret_t code_edit_set_show_line_number(widget_t* widget, bool_t show_line_number);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t code_edit_set_readonly(widget_t* widget, bool_t readonly);
+
+/**
+ * @method code_edit_set_tab_width
+ * 设置 tab的宽度。。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {uint32_t} tab_width tab的宽度。。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t code_edit_set_tab_width(widget_t* widget, uint32_t tab_width);
 
 /**
  * @method code_edit_redo
@@ -307,8 +325,9 @@ ret_t code_edit_save(widget_t* widget, const char* filename, bool_t with_utf8_bo
 ret_t code_edit_load(widget_t* widget, const char* filename);
 
 #define CODE_EDIT_PROP_LANG "lang"
-#define CODE_EDIT_PROP_CODE_THEME "theme"
 #define CODE_EDIT_PROP_FILENAME "filename"
+#define CODE_EDIT_PROP_TAB_WIDTH "tab_width"
+#define CODE_EDIT_PROP_CODE_THEME "code_theme"
 #define CODE_EDIT_PROP_SHOW_LINE_NUMBER "show_line_number"
 
 #define WIDGET_TYPE_CODE_EDIT "code_edit"

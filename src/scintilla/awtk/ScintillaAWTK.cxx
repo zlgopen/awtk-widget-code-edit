@@ -78,7 +78,7 @@ ScintillaAWTK::ScintillaAWTK(WindowID wid) {
   SSM(SCI_SETCODEPAGE, SC_CP_UTF8, 0);
   SSM(SCI_SETCARETPERIOD, 500, 0);
   SSM(SCI_SETFOCUS, 1, 0);
-
+  SSM(SCI_SETZOOM, 0, 0);
 #if 0
   SSM(SCI_SETLEXER, SCLEX_CPP, 0);
   SSM(SCI_STYLESETFORE, SCE_C_COMMENT, 0x008000);
@@ -92,8 +92,8 @@ ScintillaAWTK::ScintillaAWTK(WindowID wid) {
   SSM(SCI_SETMARGINTYPEN, 0, SC_MARGIN_NUMBER);
   SSM(SCI_SETMARGINWIDTHN, 0, 40);
 
-  SSM(SCI_STYLESETSIZE, 0, 20);
-  SSM(SCI_STYLESETSIZE, STYLE_DEFAULT, 20);
+  SSM(SCI_STYLESETSIZE, 0, 10);
+  SSM(SCI_STYLESETSIZE, STYLE_DEFAULT, 10);
   SSM(SCI_STYLESETFONT, 0, (sptr_t)("default"));
   SSM(SCI_STYLESETFONT, STYLE_DEFAULT, (sptr_t)("default"));
 
@@ -384,7 +384,7 @@ ret_t ScintillaAWTK::OnKeyDown(key_event_t* e) {
     } else if (e->key == TK_KEY_MINUS) {
       SSM(SCI_ZOOMOUT, 0, 0);
     } else if (e->key == TK_KEY_0) {
-      SSM(SCI_SETZOOM, 1, 0);
+      SSM(SCI_SETZOOM, 0, 0);
     }
 
     return RET_STOP;
