@@ -428,13 +428,13 @@ static ret_t code_edit_get_text(widget_t* widget, value_t* v) {
   return_value_if_fail(str_extend(str, len + 1) == RET_OK, RET_FAIL);
 
   str_set(str, "");
-  SSM(SCI_GETTEXT, len, (sptr_t)(str->str));
+  SSM(SCI_GETTEXT, len + 1, (sptr_t)(str->str));
+  value_set_str(v, str->str);
 
   return RET_OK;
 }
 
 static ret_t code_edit_set_text(widget_t* widget, const value_t* v) {
-  uint32_t len = 0;
   str_t* str = NULL;
   ScintillaAWTK* impl = NULL;
   code_edit_t* code_edit = CODE_EDIT(widget);
