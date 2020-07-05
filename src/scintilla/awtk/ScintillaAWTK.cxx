@@ -16,9 +16,7 @@
 #include <memory>
 
 #include "awtk.h"
-
 #include "Platform.h"
-
 #include "ILoader.h"
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -75,26 +73,29 @@ ScintillaAWTK::ScintillaAWTK(WindowID wid) {
 
   Scintilla_LinkLexers();
 
+  SSM(SCI_SETTABWIDTH, 4, 0);
   SSM(SCI_STYLECLEARALL, 0, 0);
-  SSM(SCI_SETLEXER, SCLEX_CPP, 0);
-//  SSM(SCI_SETKEYWORDS, 0, (sptr_t) "int char xy_t wh_h");
+  SSM(SCI_SETCODEPAGE, SC_CP_UTF8, 0);
+  SSM(SCI_SETCARETPERIOD, 500, 0);
+  SSM(SCI_SETFOCUS, 1, 0);
 
+#if 0
+  SSM(SCI_SETLEXER, SCLEX_CPP, 0);
   SSM(SCI_STYLESETFORE, SCE_C_COMMENT, 0x008000);
   SSM(SCI_STYLESETFORE, SCE_C_COMMENTLINE, 0x008000);
   SSM(SCI_STYLESETFORE, SCE_C_NUMBER, 0x808000);
   SSM(SCI_STYLESETFORE, SCE_C_WORD, 0x800000);
   SSM(SCI_STYLESETFORE, SCE_C_STRING, 0x800080);
   SSM(SCI_STYLESETBOLD, SCE_C_OPERATOR, 1);
-  SSM(SCI_SETCODEPAGE, SC_CP_UTF8, 0);
+#endif
+
   SSM(SCI_SETMARGINTYPEN, 0, SC_MARGIN_NUMBER);
   SSM(SCI_SETMARGINWIDTHN, 0, 40);
-  SSM(SCI_SETTABWIDTH, 4, 0);
-  SSM(SCI_STYLESETFONT, 0, (sptr_t)("default"));
-  SSM(SCI_STYLESETFONT, STYLE_DEFAULT, (sptr_t)("default"));
+
   SSM(SCI_STYLESETSIZE, 0, 20);
   SSM(SCI_STYLESETSIZE, STYLE_DEFAULT, 20);
-  SSM(SCI_SETCARETPERIOD, 500, 0);
-  SSM(SCI_SETFOCUS, 1, 0);
+  SSM(SCI_STYLESETFONT, 0, (sptr_t)("default"));
+  SSM(SCI_STYLESETFONT, STYLE_DEFAULT, (sptr_t)("default"));
 
   return;
 }
@@ -111,8 +112,8 @@ void ScintillaAWTK::OnScrollBarChange(const char* name, int32_t value) {
     widget_t* bar = widget_lookup(this->widget, VBAR_NAME, TRUE);
     int line_height = this->vs.lineHeight;
     int virtual_h = SCROLL_BAR(bar)->virtual_size;
-    int total_lines = virtual_h/line_height + 1;
-    int visible_lines = bar->h/line_height + 1;
+    int total_lines = virtual_h / line_height + 1;
+    int visible_lines = bar->h / line_height + 1;
     float percent = (float)value / (float)(virtual_h);
     int line = (total_lines - visible_lines) * percent;
 
@@ -125,7 +126,6 @@ void ScintillaAWTK::OnScrollBarChange(const char* name, int32_t value) {
 
   return;
 }
-
 
 void ScintillaAWTK::SetVerticalScrollPos() {
   int line_height = this->vs.lineHeight;
@@ -185,7 +185,7 @@ void ScintillaAWTK::CopyToClipboard(const SelectionText& selectedText) {
 void ScintillaAWTK::SetMouseCapture(bool on) {
   return_if_fail(this->widget != NULL);
 
-  if(on) {
+  if (on) {
     widget_grab(this->widget->parent, this->widget);
   } else {
     widget_ungrab(this->widget->parent, this->widget);
@@ -366,9 +366,6 @@ static int KeyTranslate(int keyIn) noexcept {
 ret_t ScintillaAWTK::OnKeyDown(key_event_t* e) {
   lastKeyDownConsumed = false;
   bool_t ctrl = e->ctrl || e->cmd;
-  this->KeyDownWithModifiers(
-      KeyTranslate(e->key), ModifierFlags(e->shift, e->ctrl, e->menu), &lastKeyDownConsumed);
-
   if (ctrl) {
     if (e->key == TK_KEY_c) {
       SSM(SCI_COPY, 0, 0);
@@ -382,10 +379,19 @@ ret_t ScintillaAWTK::OnKeyDown(key_event_t* e) {
       SSM(SCI_REDO, 0, 0);
     } else if (e->key == TK_KEY_a) {
       SSM(SCI_SELECTALL, 0, 0);
-    } else if (e->key == TK_KEY_p) {
-      SSM(SCI_AUTOCSHOW, 0, (sptr_t)"aaa, aab, aac");
+    } else if (e->key == TK_KEY_PLUS) {
+      SSM(SCI_ZOOMIN, 0, 0);
+    } else if (e->key == TK_KEY_MINUS) {
+      SSM(SCI_ZOOMOUT, 0, 0);
+    } else if (e->key == TK_KEY_0) {
+      SSM(SCI_SETZOOM, 1, 0);
     }
+
+    return RET_STOP;
   }
+
+  this->KeyDownWithModifiers(KeyTranslate(e->key), ModifierFlags(e->shift, e->ctrl, e->menu),
+                             &lastKeyDownConsumed);
 
   return RET_STOP;
 }
@@ -426,10 +432,8 @@ void ScintillaAWTK::NotifyChange() {
 void ScintillaAWTK::NotifyParent(SCNotification scn) {
 }
 
-
 bool ScintillaAWTK::HaveMouseCapture() {
   return true;
 }
-
 
 }  // namespace Scintilla

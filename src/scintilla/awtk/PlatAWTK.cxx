@@ -61,7 +61,7 @@ class FontHandle {
     this->name = NULL;
     this->weight = fp.weight;
     this->italic = fp.italic;
-    this->size = TK_DEFAULT_FONT_SIZE;
+    this->size = fp.size;
   }
   ~FontHandle() {
     TKMEM_FREE(this->name);
@@ -468,14 +468,15 @@ std::unique_ptr<IScreenLineLayout> SurfaceImpl::Layout(const IScreenLine*) {
 
 void SurfaceImpl::SetFont(Font& font) {
   vgcanvas_t* vg = this->GetVgCanvas();
+  FontHandle* fh = static_cast<FontHandle*>(font.fid);
 
   if (vg != NULL) {
     float_t a = 0;
     float_t d = 0;
     float_t lh = 0;
     vgcanvas_set_font(vg, NULL);
-    vgcanvas_set_font_size(vg, 20);
-    canvas_set_font(this->canvas, NULL, 20);
+    vgcanvas_set_font_size(vg, fh->size);
+    canvas_set_font(this->canvas, NULL, fh->size);
 
     canvas_get_text_metrics(this->canvas, &a, &d, &lh);
     this->ascent = tk_abs(a);
@@ -566,16 +567,15 @@ XYPOSITION SurfaceImpl::WidthText(Font& font_, std::string_view text) {
 // Ascent and descent determined by Pango font metrics.
 
 XYPOSITION SurfaceImpl::Ascent(Font& font_) {
-  int a = this->ascent ? this->ascent : 15;
-  log_debug("a=%d\n", a);
+  this->SetFont(font_);
 
-  return a;
+  return this->ascent;
 }
 
 XYPOSITION SurfaceImpl::Descent(Font& font_) {
-  int d = this->descent ? this->descent : 5;
-  log_debug("d=%d\n", d);
-  return d;
+  this->SetFont(font_);
+
+  return this->descent;
 }
 
 XYPOSITION SurfaceImpl::InternalLeading(Font&) {

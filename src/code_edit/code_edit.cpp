@@ -152,7 +152,8 @@ static ret_t code_edit_apply_lang(widget_t* widget) {
     int v = sci_lang_value(code_edit->lang);
     return_value_if_fail(v >= 0, RET_BAD_PARAMS);
     SSM(SCI_SETLEXER, v, 0);
-
+    SSM(SCI_STYLECLEARALL, 0, 0);
+    
     info = assets_manager_ref(am, ASSET_TYPE_XML, code_edit->code_theme);
     if (info != NULL) {
       code_theme_t theme;
