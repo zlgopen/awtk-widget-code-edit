@@ -1,6 +1,6 @@
-# awtk-widget-code_edit
+# awtk-widget-code-edit
 
-code_edit 控件。
+基于 [scintilla](https://github.com/mirror/scintilla) 实现的代码编辑控件。
 
 ![](docs/images/ui.jpg)
 
@@ -23,7 +23,6 @@ python scripts/update_res.py all
 > 也可以使用 Designer 打开项目，之后点击 “打包” 按钮进行生成
 > 如果资源发生修改，则需要重新生成资源。
 
-
 2. 编译
 
 ```
@@ -40,4 +39,12 @@ scons
 
 ## 文档
 
-[AWTK 自定义控件规范](https://github.com/zlgopen/awtk/blob/master/docs/custom_widget_rules.md)
+* 基本用法
+
+```xml
+  <code_edit name="code" x="10" y="10" w="-20" h="-108" code_theme="stylers" filename="data/test.c">
+   <scroll_bar_d name="vbar" x="right" y="0" w="14" h="100%" value="0"/>
+  </code_edit>
+```
+
+* [AWTK 自定义控件规范](https://github.com/zlgopen/awtk/blob/master/docs/custom_widget_rules.md)
