@@ -358,9 +358,12 @@ void SurfaceImpl::Polygon(Point* pts, size_t npts, ColourDesired fore, ColourDes
 }
 
 void SurfaceImpl::RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back) {
+  int w = rc.right - rc.left + 1;
+  int h = rc.bottom - rc.top + 1;
   vgcanvas_t* vg = this->GetVgCanvas();
+
   return_if_fail(vg != NULL);
-  if (rc.left >= rc.right || rc.top >= rc.bottom) {
+  if (rc.left > rc.right || rc.top > rc.bottom) {
     return;
   }
 
@@ -368,7 +371,7 @@ void SurfaceImpl::RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired
   int ox = this->canvas->ox;
   int oy = this->canvas->oy;
   vgcanvas_translate(vg, ox, oy);
-  vgcanvas_rect(vg, rc.left + 0.5, rc.top + 0.5, rc.right - rc.left - 1, rc.bottom - rc.top - 1);
+  vgcanvas_rect(vg, rc.left, rc.top, w, h);
   vgcanvas_translate(vg, -ox, -oy);
 
   vgcanvas_set_fill_color(vg, color_from_sci(back));
@@ -378,12 +381,12 @@ void SurfaceImpl::RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired
 }
 
 void SurfaceImpl::FillRectangle(PRectangle rc, ColourDesired back) {
-  int w = rc.right - rc.left;
-  int h = rc.bottom - rc.top; 
+  int w = rc.right - rc.left + 1;
+  int h = rc.bottom - rc.top + 1;
   vgcanvas_t* vg = this->GetVgCanvas();
   return_if_fail(vg != NULL);
 
-  if (rc.left >= rc.right || rc.top >= rc.bottom) {
+  if (rc.left > rc.right || rc.top > rc.bottom) {
     return;
   }
 
@@ -496,12 +499,7 @@ void SurfaceImpl::DrawTextBase(PRectangle rc, Font& font_, XYPOSITION ybase, std
   this->SetFont(font_);
   vgcanvas_set_fill_color(vg, color_from_sci(fore));
   str_set_with_len(str, text.data(), text.length());
-
-  int ox = this->canvas->ox;
-  int oy = this->canvas->oy;
-  vgcanvas_translate(vg, ox, oy);
-  vgcanvas_fill_text(vg, str->str, rc.left, rc.top, 1000);
-  vgcanvas_translate(vg, -ox, -oy);
+  canvas_draw_utf8(this->canvas, str->str, rc.left, rc.top);
 }
 
 void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font& font_, XYPOSITION ybase,
@@ -545,8 +543,8 @@ void SurfaceImpl::MeasureWidths(Font& font_, std::string_view text, XYPOSITION* 
   for (i = 0; i < wstr->size; i++) {
     wchar_t c = wstr->str[i];
     str_from_wstr_with_len(str, &c, 1);
-    x += vgcanvas_measure_text(vg, str->str);
-    for(j = 0; j < str->size; j++) {
+    x += canvas_measure_text(this->canvas, &c, 1);
+    for (j = 0; j < str->size; j++) {
       positions[k++] = tk_roundi(x);
       assert(k <= text.length());
     }
@@ -554,14 +552,11 @@ void SurfaceImpl::MeasureWidths(Font& font_, std::string_view text, XYPOSITION* 
 }
 
 XYPOSITION SurfaceImpl::WidthText(Font& font_, std::string_view text) {
-  str_t* str = &(this->str);
-  vgcanvas_t* vg = this->GetVgCanvas();
-  return_value_if_fail(vg != NULL, 0);
-
+  wstr_t* str = &(this->wstr);
+  wstr_set_utf8(str, text.data());
+  
   this->SetFont(font_);
-  str_set_with_len(str, text.data(), text.length());
-
-  return vgcanvas_measure_text(vg, str->str);
+  return canvas_measure_text(this->canvas, str->str, str->size);
 }
 
 // Ascent and descent determined by Pango font metrics.
