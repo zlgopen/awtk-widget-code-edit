@@ -74,6 +74,7 @@ static void xml_loader_on_start_on_style(XmlBuilder* thiz, const char* tag, cons
     }
 
     if (tk_str_eq(name, "name")) {
+      style.name = value;
     } else if (tk_str_eq(name, "styleID")) {
       style.id = tk_atoi(value);
     } else if (tk_str_eq(name, "fgColor")) {

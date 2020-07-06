@@ -497,7 +497,7 @@ void SurfaceImpl::DrawTextBase(PRectangle rc, Font& font_, XYPOSITION ybase, std
   return_if_fail(vg != NULL);
 
   this->SetFont(font_);
-  vgcanvas_set_fill_color(vg, color_from_sci(fore));
+  canvas_set_text_color(this->canvas, color_from_sci(fore));
   str_set_with_len(str, text.data(), text.length());
   canvas_draw_utf8(this->canvas, str->str, rc.left, rc.top);
 }

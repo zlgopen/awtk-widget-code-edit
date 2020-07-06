@@ -324,6 +324,16 @@ ret_t code_edit_save(widget_t* widget, const char* filename, bool_t with_utf8_bo
  */
 ret_t code_edit_load(widget_t* widget, const char* filename);
 
+/**
+ * @method code_edit_is_modified
+ * 检查文档是否变化。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ *
+ * @return {bool_t} 返回TRUE表示是，否则表示否。
+ */
+bool_t code_edit_is_modified(widget_t* widget);
+
 #define CODE_EDIT_PROP_LANG "lang"
 #define CODE_EDIT_PROP_FILENAME "filename"
 #define CODE_EDIT_PROP_TAB_WIDTH "tab_width"

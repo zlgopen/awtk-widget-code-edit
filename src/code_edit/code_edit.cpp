@@ -81,10 +81,10 @@
 #include "Converter.h"
 #include "ExternalLexer.h"
 
-#include "base/input_method.h"
-#include "scintilla/awtk/ScintillaAWTK.h"
 #include "sci_lang_names.h"
+#include "base/input_method.h"
 #include "code_edit/code_theme.h"
+#include "scintilla/awtk/ScintillaAWTK.h"
 
 using Scintilla::ScintillaAWTK;
 using Scintilla::Surface;
@@ -135,35 +135,37 @@ static ret_t code_edit_on_widget_style(void* ctx, code_style_t* style) {
   } else if (style->id != 0) {
     code_edit_on_word_style(ctx, style);
   }
+
   return RET_OK;
 }
 
-static ret_t code_edit_apply_lang(widget_t* widget) {
+static ret_t code_edit_apply_lang_theme(widget_t* widget) {
   ScintillaAWTK* impl = NULL;
   code_edit_t* code_edit = CODE_EDIT(widget);
   return_value_if_fail(code_edit != NULL, RET_BAD_PARAMS);
   impl = static_cast<ScintillaAWTK*>(code_edit->impl);
   return_value_if_fail(impl != NULL, RET_BAD_PARAMS);
 
-  if (code_edit->lang != NULL && code_edit->code_theme != NULL) {
+  if (code_edit->code_theme != NULL && code_edit->lang != NULL) {
     const asset_info_t* info = NULL;
+    int lexer = sci_lang_value(code_edit->lang);
     assets_manager_t* am = widget_get_assets_manager(widget);
-
-    int v = sci_lang_value(code_edit->lang);
-    return_value_if_fail(v >= 0, RET_BAD_PARAMS);
-    SSM(SCI_SETLEXER, v, 0);
-    SSM(SCI_STYLECLEARALL, 0, 0);
 
     info = assets_manager_ref(am, ASSET_TYPE_XML, code_edit->code_theme);
     if (info != NULL) {
       code_theme_t theme;
       code_theme_init(&theme, code_edit_on_word_style, code_edit_on_widget_style, widget,
                       code_edit->lang);
+
+      SSM(SCI_STYLECLEARALL, 0, 0);
       code_theme_load(&theme, (const char*)(info->data), info->size);
       code_theme_deinit(&theme);
       assets_manager_unref(am, info);
       SSM(SCI_SETZOOM, 5, 0);
     }
+
+    return_value_if_fail(lexer >= 0, RET_BAD_PARAMS);
+    SSM(SCI_SETLEXER, lexer, 0);
   }
 
   return RET_OK;
@@ -175,7 +177,7 @@ ret_t code_edit_set_lang(widget_t* widget, const char* lang) {
 
   code_edit->lang = tk_str_copy(code_edit->lang, lang);
 
-  return code_edit_apply_lang(widget);
+  return code_edit_apply_lang_theme(widget);
 }
 
 ret_t code_edit_set_code_theme(widget_t* widget, const char* code_theme) {
@@ -183,8 +185,8 @@ ret_t code_edit_set_code_theme(widget_t* widget, const char* code_theme) {
   return_value_if_fail(code_edit != NULL, RET_BAD_PARAMS);
 
   code_edit->code_theme = tk_str_copy(code_edit->code_theme, code_theme);
-
-  return code_edit_apply_lang(widget);
+  
+  return code_edit_apply_lang_theme(widget);
 }
 
 ret_t code_edit_set_filename(widget_t* widget, const char* filename) {
@@ -610,3 +612,8 @@ ret_t code_edit_load(widget_t* widget, const char* filename) {
 
   return RET_OK;
 }
+
+bool_t code_edit_is_modified(widget_t* widget) {
+  return code_edit_cmd_bool_void(widget, SCI_GETMODIFY);
+}
+

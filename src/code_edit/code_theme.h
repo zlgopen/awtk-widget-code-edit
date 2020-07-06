@@ -33,7 +33,8 @@ typedef struct _code_style_t {
   bool_t italic;
   uint32_t font_size;
   const char* font_name;
-
+  const char* name;
+  
   uint32_t has_bg : 1;
   uint32_t has_fg : 1;
   uint32_t has_bold : 1;
