@@ -13,15 +13,25 @@ def getAwtkRoot():
 
 
 def isBuildShared():
-  return 'WITH_AWTK_SO' in os.environ and os.environ['WITH_AWTK_SO'] == 'true' and BUILD_SHARED == 'true' and awtk.OS_NAME == 'Windows'
+  return 'WITH_AWTK_SO' in os.environ and os.environ['WITH_AWTK_SO'] == 'true' and BUILD_SHARED == 'true'
 
 
 def copyAwtkDLL():
-  src = os.path.join(AWTK_ROOT, 'bin/awtk.dll')
-  dst = os.path.join(APP_BIN_DIR, 'awtk.dll')
+  if awtk.OS_NAME == 'Darwin':
+    src = os.path.join(AWTK_ROOT, 'bin/libawtk.dylib')
+    dst = os.path.join(APP_BIN_DIR, 'libawtk.dylib')
+  elif awtk.OS_NAME == 'Linux':
+    src = os.path.join(AWTK_ROOT, 'bin/libawtk.so')
+    dst = os.path.join(APP_BIN_DIR, 'libawtk.so')
+  elif awtk.OS_NAME == 'Windows':
+    src = os.path.join(AWTK_ROOT, 'bin/awtk.dll')
+    dst = os.path.join(APP_BIN_DIR, 'awtk.dll')
+  else:
+    print('not support ' + awtk.OS_NAME)
+    return
 
   if not os.path.exists(src):
-    print('Can\'t find awtk.dll. Please build AWTK before!')
+    print('Can\'t find ' + src + '. Please build AWTK before!')
   else:
     if not os.path.exists(APP_BIN_DIR):
         os.makedirs(APP_BIN_DIR)
@@ -66,6 +76,11 @@ if len(LANGUAGE) > 0:
   if len(lan) >= 2:
     APP_DEFAULT_COUNTRY = lan[1]
 
+SHARED = ARGUMENTS.get('SHARED', '')
+if len(SHARED) > 0 and SHARED.lower().startswith('f'):
+  BUILD_SHARED = 'false'
+
+APP_CPPPATH = []
 APP_CCFLAGS = ' -DLCD_WIDTH=' + LCD_WIDTH + ' -DLCD_HEIGHT=' + LCD_HEIGHT + ' ' 
 APP_CXXFLAGS = '-DSCI_LEXER -DAWTK=1 '
 APP_CCFLAGS = APP_CCFLAGS + ' -DAPP_DEFAULT_FONT=\\\"' + APP_DEFAULT_FONT + '\\\" '
@@ -118,6 +133,9 @@ if isBuildShared():
   APP_LIBPATH = [APP_BIN_DIR, APP_LIB_DIR]
   AWTK_LIBS = awtk.SHARED_LIBS
   copyAwtkDLL();
+
+  if awtk.OS_NAME == 'Linux':
+    APP_LINKFLAGS += ' -Wl,-rpath=' + APP_BIN_DIR + ' '
 
 if hasattr(awtk, 'CC'):
   DefaultEnvironment(
