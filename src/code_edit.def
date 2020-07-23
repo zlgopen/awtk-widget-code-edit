@@ -8,18 +8,20 @@ EXPORTS
     code_edit_set_filename @6
     code_edit_set_show_line_number @7
     code_edit_set_readonly @8
-    code_edit_redo @9
-    code_edit_undo @10
-    code_edit_copy @11
-    code_edit_cut @12
-    code_edit_paste @13
-    code_edit_clear @14
-    code_edit_select_none @15
-    code_edit_select_all @16
-    code_edit_can_redo @17
-    code_edit_can_undo @18
-    code_edit_can_copy @19
-    code_edit_can_cut @20
-    code_edit_can_paste @21
-    code_edit_save @22
-    code_edit_load @23
+    code_edit_set_tab_width @9
+    code_edit_redo @10
+    code_edit_undo @11
+    code_edit_copy @12
+    code_edit_cut @13
+    code_edit_paste @14
+    code_edit_clear @15
+    code_edit_select_none @16
+    code_edit_select_all @17
+    code_edit_can_redo @18
+    code_edit_can_undo @19
+    code_edit_can_copy @20
+    code_edit_can_cut @21
+    code_edit_can_paste @22
+    code_edit_save @23
+    code_edit_load @24
+    code_edit_is_modified @25
