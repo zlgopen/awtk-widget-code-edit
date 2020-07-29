@@ -196,6 +196,29 @@
             "type": "widget_t*",
             "name": "widget",
             "desc": "widget对象。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "tab_width",
+            "desc": "tab的宽度。。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 tab的宽度。。",
+        "name": "code_edit_set_tab_width",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
           }
         ],
         "annotation": {
@@ -474,6 +497,24 @@
           "type": "ret_t",
           "desc": "返回RET_OK表示成功，否则表示失败。"
         }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "检查文档是否变化。",
+        "name": "code_edit_is_modified",
+        "return": {
+          "type": "bool_t",
+          "desc": "返回TRUE表示是，否则表示否。"
+        }
       }
     ],
     "events": [],
@@ -534,6 +575,19 @@
         "name": "readonly",
         "desc": "是否显示行号。",
         "type": "bool_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "tab_width",
+        "desc": "tab的宽度。",
+        "type": "uint32_t",
         "annotation": {
           "set_prop": true,
           "get_prop": true,
