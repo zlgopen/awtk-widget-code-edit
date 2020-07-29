@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   code_edit.c
  * Author: AWTK Develop Team
  * Brief:  代码编辑器控件。

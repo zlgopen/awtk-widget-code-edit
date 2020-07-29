@@ -1,11 +1,11 @@
-﻿import os
+import os
 import platform
 import app_helper as app
 
 ARGUMENTS['LCD'] = '800_480'
-
 helper = app.Helper(ARGUMENTS);
 APP_ROOT = helper.APP_ROOT
+
 APP_CPPPATH = [
   os.path.join(APP_ROOT, "src"),
   os.path.join(APP_ROOT, "src/scintilla/src"),
