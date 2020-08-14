@@ -1,6 +1,6 @@
 import os
 import platform
-import app_helper as app
+import scripts.app_helper as app
 
 ARGUMENTS['LCD'] = '800_480'
 helper = app.Helper(ARGUMENTS);
