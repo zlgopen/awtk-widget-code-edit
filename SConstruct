@@ -2,7 +2,12 @@ import os
 import platform
 import scripts.app_helper as app
 
-ARGUMENTS['LCD'] = '800_480'
+def initArgument(name, defVal):
+    val = ARGUMENTS.get(name, '')
+    if len(val) == 0:
+        ARGUMENTS[name] = defVal
+
+initArgument('LCD', '800_480')
 helper = app.Helper(ARGUMENTS);
 APP_ROOT = helper.APP_ROOT
 
