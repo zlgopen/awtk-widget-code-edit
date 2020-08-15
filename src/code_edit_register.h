@@ -36,6 +36,16 @@ BEGIN_C_DECLS
  */
 ret_t code_edit_register(void);
 
+/**
+ * @method  code_edit_supported_render_mode
+ * 获取支持的渲染模式。
+ *
+ * @annotation ["global"]
+ *
+ * @return {const char*} 返回渲染模式。
+ */
+const char* code_edit_supported_render_mode(void);
+
 END_C_DECLS
 
 #endif /*TK_CODE_EDIT_REGISTER_H*/

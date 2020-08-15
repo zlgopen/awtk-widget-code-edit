@@ -30,6 +30,26 @@ BEGIN_C_DECLS
  * @parent widget_t
  * @annotation ["scriptable","design","widget"]
  * 代码编辑器控件。
+ *
+ * 在xml中使用"code\_edit"标签创建代码编辑器控件。如：
+ *
+ * ```xml
+ * <!-- ui -->
+ * <code_edit name="code_edit" x="10" y="10" w="200" h="200" tab_width="2">
+ *   <scroll_bar_d name="scroll_bar" x="r" y="0" w="14" h="100%" value="0"/>
+ * </code_edit>
+ * ```
+ *
+ * 可用通过style来设置控件的显示风格，如字体的大小和颜色等等。如：
+ *
+ * ```xml
+ * <!-- style -->
+ * <code_edit>
+ *   <style name="default" border_color="black" font_size="18">
+ *     <normal text_color="black" />
+ *   </style>
+ * </code_edit>
+ * ```
  */
 typedef struct _code_edit_t {
   widget_t widget;
@@ -44,7 +64,7 @@ typedef struct _code_edit_t {
   /**
    * @property {char*} code_theme
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 当前的代码的主题名称(在资源的data目录必须有相应的xml文件存在，格式与nodepad++的一致)。
+   * 当前的代码的主题名称(在资源的xml目录必须有相应的xml文件存在，格式与nodepad++的一致)。
    */
   char* code_theme;
 
@@ -68,7 +88,7 @@ typedef struct _code_edit_t {
    * 是否显示行号。
    */
   bool_t readonly;
-  
+
   /**
    * @property {uint32_t} tab_width
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]

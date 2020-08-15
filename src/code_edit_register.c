@@ -28,3 +28,7 @@
 ret_t code_edit_register(void) {
   return widget_factory_register(widget_factory(), WIDGET_TYPE_CODE_EDIT, code_edit_create);
 }
+
+const char* code_edit_supported_render_mode(void) {
+  return "OpenGL|AGGE-BGR565|AGGE-BGRA8888|AGGE-MONO";
+}
