@@ -1,14 +1,15 @@
-import os
+﻿import os
 import platform
-import scripts.app_helper as app
+import scripts.awtk_locator as locator
 
-def initArgument(name, defVal):
-    val = ARGUMENTS.get(name, '')
-    if len(val) == 0:
-        ARGUMENTS[name] = defVal
+def getAppHelper(ARGUMENTS):
+    locator.init(ARGUMENTS)
 
-initArgument('LCD', '800_480')
-helper = app.Helper(ARGUMENTS);
+    from app_helper_base import AppHelperBase
+    return AppHelperBase(ARGUMENTS)
+
+helper = getAppHelper(ARGUMENTS)
+
 APP_ROOT = helper.APP_ROOT
 
 APP_CPPPATH = [
