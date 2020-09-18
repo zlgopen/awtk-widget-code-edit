@@ -614,7 +614,7 @@
       }
     ],
     "header": "code_edit/code_edit.h",
-    "desc": "代码编辑器控件。\n\n在xml中使用\"code\\_edit\"标签创建代码编辑器控件。如：\n\n```xml\n<!-- ui -->\n<code_edit name=\"code\" x=\"10\" y=\"10\" w=\"200\" h=\"200\" tab_width=\"2\">\n<scroll_bar_d name=\"vbar\" x=\"r\" y=\"0\" w=\"14\" h=\"100%\" value=\"0\"/>\n</code_edit>\n```\n\n可用通过style来设置控件的显示风格，如字体的大小和颜色等等。如：\n\n```xml\n<!-- style -->\n<code_edit>\n<style name=\"default\" border_color=\"black\" font_size=\"18\">\n<normal text_color=\"black\" />\n</style>\n</code_edit>\n```",
+    "desc": "代码编辑器控件。\n\n在xml中使用\"code\\_edit\"标签创建代码编辑器控件。如：\n\n```xml\n<!-- ui -->\n<code_edit name=\"code_edit\" x=\"10\" y=\"10\" w=\"200\" h=\"200\" tab_width=\"2\">\n<scroll_bar_d name=\"scroll_bar\" x=\"r\" y=\"0\" w=\"14\" h=\"100%\" value=\"0\"/>\n</code_edit>\n```\n\n可用通过style来设置控件的显示风格，如字体的大小和颜色等等。如：\n\n```xml\n<!-- style -->\n<code_edit>\n<style name=\"default\" border_color=\"black\" font_size=\"18\">\n<normal text_color=\"black\" />\n</style>\n</code_edit>\n```",
     "name": "code_edit_t",
     "parent": "widget_t",
     "annotation": {

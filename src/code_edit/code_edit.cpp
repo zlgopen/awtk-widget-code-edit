@@ -382,8 +382,12 @@ ret_t code_edit_on_event(widget_t* widget, event_t* e) {
       break;
     }
     case EVT_BLUR: {
+      value_change_event_t evt;
+
       input_method_request(input_method(), NULL);
-      widget_dispatch_simple_event(widget, EVT_VALUE_CHANGED);
+      value_set_wstr(&(evt.old_value), NULL);
+      value_set_wstr(&(evt.new_value), widget->text.str);
+      widget_dispatch(widget, (event_t*)&evt);
       break;
     }
     case EVT_FOCUS: {
