@@ -1,14 +1,8 @@
 ﻿import os
 import platform
-import scripts.awtk_locator as locator
+import scripts.app_helper as app
 
-def getAppHelper(ARGUMENTS):
-    locator.init(ARGUMENTS)
-
-    from app_helper_base import AppHelperBase
-    return AppHelperBase(ARGUMENTS)
-
-helper = getAppHelper(ARGUMENTS)
+helper = app.Helper(ARGUMENTS)
 
 APP_ROOT = helper.APP_ROOT
 

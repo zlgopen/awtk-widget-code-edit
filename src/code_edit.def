@@ -1,28 +1,28 @@
 LIBRARY   code_edit
 EXPORTS
-    code_edit_register @1
-    code_edit_supported_render_mode @2
-    code_edit_create @3
-    code_edit_cast @4
-    code_edit_set_lang @5
-    code_edit_set_code_theme @6
-    code_edit_set_filename @7
-    code_edit_set_show_line_number @8
-    code_edit_set_readonly @9
-    code_edit_set_tab_width @10
-    code_edit_redo @11
-    code_edit_undo @12
-    code_edit_copy @13
-    code_edit_cut @14
-    code_edit_paste @15
-    code_edit_clear @16
-    code_edit_select_none @17
-    code_edit_select_all @18
-    code_edit_can_redo @19
-    code_edit_can_undo @20
-    code_edit_can_copy @21
-    code_edit_can_cut @22
-    code_edit_can_paste @23
-    code_edit_save @24
-    code_edit_load @25
-    code_edit_is_modified @26
+    code_edit_register
+    code_edit_supported_render_mode
+    code_edit_create
+    code_edit_cast
+    code_edit_set_lang
+    code_edit_set_code_theme
+    code_edit_set_filename
+    code_edit_set_show_line_number
+    code_edit_set_readonly
+    code_edit_set_tab_width
+    code_edit_redo
+    code_edit_undo
+    code_edit_copy
+    code_edit_cut
+    code_edit_paste
+    code_edit_clear
+    code_edit_select_none
+    code_edit_select_all
+    code_edit_can_redo
+    code_edit_can_undo
+    code_edit_can_copy
+    code_edit_can_cut
+    code_edit_can_paste
+    code_edit_save
+    code_edit_load
+    code_edit_is_modified
