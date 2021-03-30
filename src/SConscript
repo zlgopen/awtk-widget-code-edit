@@ -14,7 +14,7 @@ SOURCES += Glob('scintilla/lexlib/*.cxx') + \
   Glob('scintilla/awtk/*.cxx');
 
 EXPORT_DEF=''
-if OS_NAME == 'Windows':
+if OS_NAME == 'Windows' and os.environ['TOOLS_NAME'] == '':
   EXPORT_DEF = ' /DEF:"src/code_edit.def" '
 
 if 'BUILD_SHARED' in os.environ and os.environ['BUILD_SHARED'] == 'True':
