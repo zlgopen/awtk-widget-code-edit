@@ -48,6 +48,9 @@ typedef ret_t (*code_theme_on_widget_style_t)(void* ctx, code_style_t* style);
 
 BEGIN_C_DECLS
 
+/**
+ * @class code_theme_t
+ */
 typedef struct _code_theme_t {
   code_theme_on_word_style_t on_word_style;
   code_theme_on_widget_style_t on_widget_style;
@@ -56,9 +59,38 @@ typedef struct _code_theme_t {
   void* parser;
 } code_theme_t;
 
+/**
+ * @method code_theme_init
+ * 初始化。
+ * @param {code_theme_t*} theme theme对象
+ * @param {code_theme_on_word_style_t} on_word_style 回调函数。
+ * @param {code_theme_on_widget_style_t} on_widget_style 回调函数。
+ * @param {void*} ctx 回调函数上下文。
+ * @param {const char*} lang 语言。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+
 ret_t code_theme_init(code_theme_t* theme, code_theme_on_word_style_t on_word_style,
                       code_theme_on_widget_style_t on_widget_style, void* ctx, const char* lang);
+/**
+ * @method code_theme_load
+ * 加载。
+ * @param {code_theme_t*} theme theme对象
+ * @param {const char*} data 数据。
+ * @param {uint32_t} size 数据长度。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t code_theme_load(code_theme_t* theme, const char* data, uint32_t size);
+
+/**
+ * @method code_theme_deinit
+ * ~初始化。
+ * @param {code_theme_t*} theme theme对象
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t code_theme_deinit(code_theme_t* theme);
 
 END_C_DECLS

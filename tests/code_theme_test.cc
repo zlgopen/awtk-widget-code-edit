@@ -4,12 +4,20 @@
 #include <string>
 using std::string;
 
+
 static void check_style(code_style_t* a, code_style_t* b) {
-  ASSERT_EQ(memcmp(a, b, sizeof(*a)), 0);
+  ASSERT_EQ(a->id, b->id); 
+  ASSERT_EQ(a->fg, b->fg); 
+  ASSERT_EQ(a->bg, b->bg); 
+  ASSERT_EQ(a->font_size, b->font_size); 
+  ASSERT_EQ(a->has_fg, b->has_fg); 
+  ASSERT_EQ(a->has_bg, b->has_bg); 
+  ASSERT_EQ(a->has_font_size, b->has_font_size); 
 }
 
-static ret_t code_theme_on_style(void* ctx, code_style_t* style) {
-  check_style((code_style_t*)ctx, style);
+static ret_t code_theme_on_style(void* ctx, code_style_t* b) {
+  code_style_t* a = (code_style_t*)ctx;
+  check_style(a, b);
   return RET_OK;
 }
 

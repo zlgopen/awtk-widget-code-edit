@@ -35,6 +35,95 @@
       {
         "params": [
           {
+            "type": "code_theme_t*",
+            "name": "theme",
+            "desc": "theme对象"
+          },
+          {
+            "type": "code_theme_on_word_style_t",
+            "name": "on_word_style",
+            "desc": "回调函数。"
+          },
+          {
+            "type": "code_theme_on_widget_style_t",
+            "name": "on_widget_style",
+            "desc": "回调函数。"
+          },
+          {
+            "type": "void*",
+            "name": "ctx",
+            "desc": "回调函数上下文。"
+          },
+          {
+            "type": "const char*",
+            "name": "lang",
+            "desc": "语言。"
+          }
+        ],
+        "annotation": {},
+        "desc": "初始化。",
+        "name": "code_theme_init",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "code_theme_t*",
+            "name": "theme",
+            "desc": "theme对象"
+          },
+          {
+            "type": "const char*",
+            "name": "data",
+            "desc": "数据。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "size",
+            "desc": "数据长度。"
+          }
+        ],
+        "annotation": {},
+        "desc": "加载。",
+        "name": "code_theme_load",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "code_theme_t*",
+            "name": "theme",
+            "desc": "theme对象"
+          }
+        ],
+        "annotation": {},
+        "desc": "~初始化。",
+        "name": "code_theme_deinit",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [],
+    "header": "code_edit/code_theme.h",
+    "desc": "",
+    "name": "code_theme_t",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [
+      {
+        "params": [
+          {
             "type": "widget_t*",
             "name": "parent",
             "desc": "父控件"
