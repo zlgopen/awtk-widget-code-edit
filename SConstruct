@@ -26,4 +26,4 @@ helper.set_dll_def('src/code_edit.def').set_libs(['code_edit'])
 helper.add_cxxflags(APP_CXXFLAGS).add_cpppath(APP_CPPPATH).call(DefaultEnvironment)
 
 SConscriptFiles = ['src/SConscript', 'demos/SConscript', 'tests/SConscript']
-SConscript(SConscriptFiles)
+helper.SConscript(SConscriptFiles)
