@@ -17,10 +17,6 @@ APP_CPPPATH = [
 
 APP_CXXFLAGS = '-DSCI_LEXER -DAWTK=1 '
 
-if platform.system() == 'Windows':
-  APP_CXXFLAGS += ' /std:c++17 '
-else:
-  APP_CXXFLAGS += ' -std=c++17 '
 
 helper.set_dll_def('src/code_edit.def').set_libs(['code_edit'])
 helper.add_cxxflags(APP_CXXFLAGS).add_cpppath(APP_CPPPATH).call(DefaultEnvironment)
