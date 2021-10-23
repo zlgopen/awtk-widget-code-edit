@@ -10,7 +10,6 @@
 #include <cstring>
 
 #include <stdexcept>
-#include <string_view>
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -53,16 +52,16 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, int technology, cons
 	descent = static_cast<unsigned int>(surface.Descent(font));
 	capitalHeight = surface.Ascent(font) - surface.InternalLeading(font);
 	aveCharWidth = surface.AverageCharWidth(font);
-	spaceWidth = surface.WidthText(font, " ");
+	spaceWidth = surface.WidthText(font, " ", 1);
 }
 
-ViewStyle::ViewStyle() : markers(MARKER_MAX + 1), indicators(INDIC_MAX + 1) {
+ViewStyle::ViewStyle() : markers(MARKER_MAX + 1), indicators(INDICATOR_MAX + 1) {
 	Init();
 }
 
 // Copy constructor only called when printing copies the screen ViewStyle so it can be
 // modified for printing styles.
-ViewStyle::ViewStyle(const ViewStyle &source) : markers(MARKER_MAX + 1), indicators(INDIC_MAX + 1) {
+ViewStyle::ViewStyle(const ViewStyle &source) : markers(MARKER_MAX + 1), indicators(INDICATOR_MAX + 1) {
 	Init(source.styles.size());
 	styles = source.styles;
 	for (size_t sty=0; sty<source.styles.size(); sty++) {
@@ -196,10 +195,10 @@ void ViewStyle::Init(size_t stylesSize_) {
 	technology = SC_TECHNOLOGY_DEFAULT;
 	indicatorsDynamic = false;
 	indicatorsSetFore = false;
-	lineHeight = 20;
+	lineHeight = 1;
 	lineOverlap = 0;
-	maxAscent = 15;
-	maxDescent = 5;
+	maxAscent = 1;
+	maxDescent = 1;
 	aveCharWidth = 8;
 	spaceWidth = 8;
 	tabWidth = spaceWidth * 8;
@@ -340,7 +339,7 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 	controlCharWidth = 0.0;
 	if (controlCharSymbol >= 32) {
 		const char cc[2] = { static_cast<char>(controlCharSymbol), '\0' };
-		controlCharWidth = surface.WidthText(styles[STYLE_CONTROLCHAR].font, cc);
+		controlCharWidth = surface.WidthText(styles[STYLE_CONTROLCHAR].font, cc, 1);
 	}
 
 	CalculateMarginWidthAndMask();
@@ -433,7 +432,7 @@ void ViewStyle::CalcLargestMarkerHeight() {
 }
 
 int ViewStyle::GetFrameWidth() const noexcept {
-	return std::clamp(caretLineFrame, 1, lineHeight / 3);
+	return Sci::clamp(caretLineFrame, 1, lineHeight / 3);
 }
 
 bool ViewStyle::IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const noexcept {
@@ -546,7 +545,20 @@ bool ViewStyle::SetWrapIndentMode(int wrapIndentMode_) noexcept {
 }
 
 bool ViewStyle::IsBlockCaretStyle() const noexcept {
-	return (caretStyle == CARETSTYLE_BLOCK) || (caretStyle & CARETSTYLE_OVERSTRIKE_BLOCK) != 0;
+	return ((caretStyle & CARETSTYLE_INS_MASK) == CARETSTYLE_BLOCK) ||
+		(caretStyle & CARETSTYLE_OVERSTRIKE_BLOCK) != 0;
+}
+
+bool ViewStyle::IsCaretVisible() const noexcept {
+	return caretWidth > 0 && caretStyle != CARETSTYLE_INVISIBLE;
+}
+
+bool ViewStyle::DrawCaretInsideSelection(bool inOverstrike, bool imeCaretBlockOverride) const noexcept {
+	if (caretStyle & CARETSTYLE_BLOCK_AFTER)
+		return false;
+	return ((caretStyle & CARETSTYLE_INS_MASK) == CARETSTYLE_BLOCK) ||
+		(inOverstrike && (caretStyle & CARETSTYLE_OVERSTRIKE_BLOCK) != 0) ||
+		imeCaretBlockOverride;
 }
 
 ViewStyle::CaretShape ViewStyle::CaretShapeForMode(bool inOverstrike) const noexcept {
@@ -574,7 +586,7 @@ void ViewStyle::CreateAndAddFont(const FontSpecification &fs) {
 	if (fs.fontName) {
 		FontMap::iterator it = fonts.find(fs);
 		if (it == fonts.end()) {
-			fonts[fs] = std::make_unique<FontRealised>();
+			fonts[fs] = Sci::make_unique<FontRealised>();
 		}
 	}
 }

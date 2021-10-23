@@ -11,37 +11,38 @@
 #ifndef UNIQUESTRING_H
 #define UNIQUESTRING_H
 
+#include "Compat.h"
+
 namespace Scintilla {
 
-constexpr bool IsNullOrEmpty(const char* text) noexcept {
-  return text == nullptr || *text == '\0';
+constexpr bool IsNullOrEmpty(const char *text) noexcept {
+	return text == nullptr || *text == '\0';
 }
 
 using UniqueString = std::unique_ptr<const char[]>;
 
 /// Equivalent to strdup but produces a std::unique_ptr<const char[]> allocation to go
 /// into collections.
-UniqueString UniqueStringCopy(const char* text);
+UniqueString UniqueStringCopy(const char *text);
 
 // A set of strings that always returns the same pointer for each string.
 
 class UniqueStringSet {
- private:
-  std::vector<UniqueString> strings;
-
- public:
-  UniqueStringSet() noexcept;
-  // UniqueStringSet objects can not be copied.
-  UniqueStringSet(const UniqueStringSet&) = delete;
-  UniqueStringSet& operator=(const UniqueStringSet&) = delete;
-  // UniqueStringSet objects can be moved.
-  UniqueStringSet(UniqueStringSet&&) = default;
-  UniqueStringSet& operator=(UniqueStringSet&&) = default;
-  ~UniqueStringSet();
-  void Clear() noexcept;
-  const char* Save(const char* text);
+private:
+	std::vector<UniqueString> strings;
+public:
+	UniqueStringSet();
+	// UniqueStringSet objects can not be copied.
+	UniqueStringSet(const UniqueStringSet &) = delete;
+	UniqueStringSet &operator=(const UniqueStringSet &) = delete;
+	// UniqueStringSet objects can be moved.
+	UniqueStringSet(UniqueStringSet &&) = default;
+	UniqueStringSet &operator=(UniqueStringSet &&) = default;
+	~UniqueStringSet();
+	void Clear() noexcept;
+	const char *Save(const char *text);
 };
 
-}  // namespace Scintilla
+}
 
 #endif

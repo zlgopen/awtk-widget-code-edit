@@ -25,6 +25,11 @@ class Converter {
   }
   Converter(const char* charSetDestination, const char* charSetSource, bool transliterations) {
   }
+  // Deleted so Converter objects can not be copied.
+  Converter(const Converter&) = delete;
+  Converter(Converter&&) = delete;
+  Converter& operator=(const Converter&) = delete;
+  Converter& operator=(Converter&&) = delete;
   ~Converter() {
   }
   operator bool() const noexcept {

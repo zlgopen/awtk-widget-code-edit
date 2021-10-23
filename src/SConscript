@@ -14,10 +14,8 @@ SOURCES += Glob('scintilla/lexlib/*.cxx') + \
   Glob('scintilla/awtk/*.cxx');
 
 APP_CXXFLAGS = ''
-if platform.system() == 'Windows':
-  APP_CXXFLAGS += ' /std:c++17 '
-else:
-  APP_CXXFLAGS += ' -std=c++17 '
+if platform.system() != 'Windows':
+  APP_CXXFLAGS += ' -std=c++11 '
 
 env['CXXFLAGS'] = env['CXXFLAGS'] + APP_CXXFLAGS
 

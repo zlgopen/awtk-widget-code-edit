@@ -1,5 +1,5 @@
 // Scintilla source code edit control
-// PlatAWTK.cxx - implementation of platform facilities on AWTK+/Linux
+// PlatAWTK.cxx - implementation of platform facilities on AWTK/Linux
 // Copyright 1998-2004 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
@@ -10,7 +10,6 @@
 #include <cmath>
 
 #include <string>
-#include <string_view>
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -30,7 +29,7 @@
 #include "Converter.h"
 
 #ifdef _MSC_VER
-// Ignore unreferenced local functions in AWTK+ headers
+// Ignore unreferenced local functions in AWTK headers
 #pragma warning(disable : 4505)
 #endif
 
@@ -63,6 +62,11 @@ class FontHandle {
     this->italic = fp.italic;
     this->size = fp.size;
   }
+  // Deleted so FontHandle objects can not be copied.
+  FontHandle(const FontHandle&) = delete;
+  FontHandle(FontHandle&&) = delete;
+  FontHandle& operator=(const FontHandle&) = delete;
+  FontHandle& operator=(FontHandle&&) = delete;
   ~FontHandle() {
     TKMEM_FREE(this->name);
   }
@@ -74,7 +78,7 @@ FontHandle* FontHandle::CreateNewFont(const FontParameters& fp) {
 }
 
 // X has a 16 bit coordinate space, so stop drawing here to avoid wrapping
-const int maxCoordinate = 32000;
+constexpr int maxCoordinate = 32000;
 
 }  // namespace
 
@@ -121,6 +125,11 @@ class SurfaceImpl : public Surface {
 
  public:
   SurfaceImpl() noexcept;
+  // Deleted so SurfaceImpl objects can not be copied.
+  SurfaceImpl(const SurfaceImpl&) = delete;
+  SurfaceImpl(SurfaceImpl&&) = delete;
+  SurfaceImpl& operator=(const SurfaceImpl&) = delete;
+  SurfaceImpl& operator=(SurfaceImpl&&) = delete;
   ~SurfaceImpl() override;
 
   void Init(WindowID wid) override;
@@ -149,18 +158,16 @@ class SurfaceImpl : public Surface {
   void Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back) override;
   void Copy(PRectangle rc, Point from, Surface& surfaceSource) override;
 
-  std::unique_ptr<IScreenLineLayout> Layout(const IScreenLine* screenLine) override;
-
-  void DrawTextBase(PRectangle rc, Font& font_, XYPOSITION ybase, std::string_view text,
+  void DrawTextBase(PRectangle rc, Font& font_, XYPOSITION ybase, const char* s, int len,
                     ColourDesired fore);
-  void DrawTextNoClip(PRectangle rc, Font& font_, XYPOSITION ybase, std::string_view text,
+  void DrawTextNoClip(PRectangle rc, Font& font_, XYPOSITION ybase, const char* s, int len,
                       ColourDesired fore, ColourDesired back) override;
-  void DrawTextClipped(PRectangle rc, Font& font_, XYPOSITION ybase, std::string_view text,
+  void DrawTextClipped(PRectangle rc, Font& font_, XYPOSITION ybase, const char* s, int len,
                        ColourDesired fore, ColourDesired back) override;
-  void DrawTextTransparent(PRectangle rc, Font& font_, XYPOSITION ybase, std::string_view text,
+  void DrawTextTransparent(PRectangle rc, Font& font_, XYPOSITION ybase, const char* s, int len,
                            ColourDesired fore) override;
-  void MeasureWidths(Font& font_, std::string_view text, XYPOSITION* positions) override;
-  XYPOSITION WidthText(Font& font_, std::string_view text) override;
+  void MeasureWidths(Font& font_, const char* s, int len, XYPOSITION* positions) override;
+  XYPOSITION WidthText(Font& font_, const char* s, int len) override;
   XYPOSITION Ascent(Font& font_) override;
   XYPOSITION Descent(Font& font_) override;
   XYPOSITION InternalLeading(Font& font_) override;
@@ -172,7 +179,6 @@ class SurfaceImpl : public Surface {
 
   void SetUnicodeMode(bool unicodeMode_) override;
   void SetDBCSMode(int codePage) override;
-  void SetBidiR2L(bool bidiR2L_) override;
 };
 }  // namespace Scintilla
 
@@ -243,8 +249,6 @@ SurfaceImpl::SurfaceImpl() noexcept
   this->ascent = 15;
   this->descent = 5;
   this->line_height = 20;
-  this->vg = NULL;
-  this->canvas = NULL;
   this->pen_color = color_init(0, 0, 0, 0);
 
   str_init(&(this->str), 256);
@@ -465,10 +469,6 @@ void SurfaceImpl::Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back)
 void SurfaceImpl::Copy(PRectangle rc, Point from, Surface& surfaceSource) {
 }
 
-std::unique_ptr<IScreenLineLayout> SurfaceImpl::Layout(const IScreenLine*) {
-  return {};
-}
-
 void SurfaceImpl::SetFont(Font& font) {
   vgcanvas_t* vg = this->GetVgCanvas();
   FontHandle* fh = static_cast<FontHandle*>(font.fid);
@@ -490,43 +490,43 @@ void SurfaceImpl::SetFont(Font& font) {
   return;
 }
 
-void SurfaceImpl::DrawTextBase(PRectangle rc, Font& font_, XYPOSITION ybase, std::string_view text,
-                               ColourDesired fore) {
+void SurfaceImpl::DrawTextBase(PRectangle rc, Font& font_, XYPOSITION ybase, const char* s,
+                               int len, ColourDesired fore) {
   vgcanvas_t* vg = this->GetVgCanvas();
   str_t* str = &(this->str);
   return_if_fail(vg != NULL);
 
   this->SetFont(font_);
   canvas_set_text_color(this->canvas, color_from_sci(fore));
-  str_set_with_len(str, text.data(), text.length());
+  str_set_with_len(str, s, len);
   canvas_draw_utf8(this->canvas, str->str, rc.left, rc.top);
 }
 
-void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font& font_, XYPOSITION ybase,
-                                 std::string_view text, ColourDesired fore, ColourDesired back) {
+void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font& font_, XYPOSITION ybase, const char* s,
+                                 int len, ColourDesired fore, ColourDesired back) {
   FillRectangle(rc, back);
-  DrawTextBase(rc, font_, ybase, text, fore);
+  DrawTextBase(rc, font_, ybase, s, len, fore);
 }
 
-// On AWTK+, exactly same as DrawTextNoClip
-void SurfaceImpl::DrawTextClipped(PRectangle rc, Font& font_, XYPOSITION ybase,
-                                  std::string_view text, ColourDesired fore, ColourDesired back) {
+// On AWTK, exactly same as DrawTextNoClip
+void SurfaceImpl::DrawTextClipped(PRectangle rc, Font& font_, XYPOSITION ybase, const char* s,
+                                  int len, ColourDesired fore, ColourDesired back) {
   FillRectangle(rc, back);
-  DrawTextBase(rc, font_, ybase, text, fore);
+  DrawTextBase(rc, font_, ybase, s, len, fore);
 }
 
-void SurfaceImpl::DrawTextTransparent(PRectangle rc, Font& font_, XYPOSITION ybase,
-                                      std::string_view text, ColourDesired fore) {
+void SurfaceImpl::DrawTextTransparent(PRectangle rc, Font& font_, XYPOSITION ybase, const char* s,
+                                      int len, ColourDesired fore) {
   // Avoid drawing spaces in transparent mode
-  for (size_t i = 0; i < text.length(); i++) {
-    if (text[i] != ' ') {
-      DrawTextBase(rc, font_, ybase, text, fore);
+  for (int i = 0; i < len; i++) {
+    if (s[i] != ' ') {
+      DrawTextBase(rc, font_, ybase, s, len, fore);
       return;
     }
   }
 }
 
-void SurfaceImpl::MeasureWidths(Font& font_, std::string_view text, XYPOSITION* positions) {
+void SurfaceImpl::MeasureWidths(Font& font_, const char* s, int len, XYPOSITION* positions) {
   uint32_t i = 0;
   float_t x = 0;
   uint32_t k = 0;
@@ -537,7 +537,7 @@ void SurfaceImpl::MeasureWidths(Font& font_, std::string_view text, XYPOSITION* 
   return_if_fail(vg != NULL);
 
   this->SetFont(font_);
-  str_set_with_len(str, text.data(), text.length());
+  str_set_with_len(str, s, len);
   wstr_set_utf8(wstr, str->str);
 
   for (i = 0; i < wstr->size; i++) {
@@ -546,15 +546,15 @@ void SurfaceImpl::MeasureWidths(Font& font_, std::string_view text, XYPOSITION* 
     x += canvas_measure_text(this->canvas, &c, 1);
     for (j = 0; j < str->size; j++) {
       positions[k++] = tk_roundi(x);
-      assert(k <= text.length());
+      assert(k <= len);
     }
   }
 }
 
-XYPOSITION SurfaceImpl::WidthText(Font& font_, std::string_view text) {
+XYPOSITION SurfaceImpl::WidthText(Font& font_, const char* s, int len) {
   wstr_t* str = &(this->wstr);
-  wstr_set_utf8(str, text.data());
-  
+  wstr_set_utf8(str, s);
+
   this->SetFont(font_);
   return canvas_measure_text(this->canvas, str->str, str->size);
 }
@@ -586,7 +586,7 @@ XYPOSITION SurfaceImpl::Height(Font& font_) {
 }
 
 XYPOSITION SurfaceImpl::AverageCharWidth(Font& font_) {
-  return WidthText(font_, "n");
+  return WidthText(font_, "n", 1);
 }
 
 void SurfaceImpl::SetClip(PRectangle rc) {
@@ -608,9 +608,6 @@ void SurfaceImpl::SetUnicodeMode(bool unicodeMode_) {
 }
 
 void SurfaceImpl::SetDBCSMode(int codePage) {
-}
-
-void SurfaceImpl::SetBidiR2L(bool) {
 }
 
 Surface* Surface::Allocate(int) {
@@ -644,7 +641,7 @@ void Window::SetPositionRelative(PRectangle rc, const Window* relativeTo) {
 }
 
 PRectangle Window::GetClientPosition() const {
-  // On AWTK+, the client position is the window position
+  // On AWTK, the client position is the window position
   return GetPosition();
 }
 
@@ -718,6 +715,11 @@ class ListBoxX : public ListBox {
 
   ListBoxX() noexcept {
   }
+  // Deleted so ListBoxX objects can not be copied.
+  ListBoxX(const ListBoxX&) = delete;
+  ListBoxX(ListBoxX&&) = delete;
+  ListBoxX& operator=(const ListBoxX&) = delete;
+  ListBoxX& operator=(ListBoxX&&) = delete;
   ~ListBoxX() override {
   }
   void SetFont(Font& font) override;
@@ -845,7 +847,11 @@ class DynamicLibraryImpl : public DynamicLibrary {
  public:
   explicit DynamicLibraryImpl(const char* modulePath) noexcept {
   }
-
+  // Deleted so DynamicLibraryImpl objects can not be copied.
+  DynamicLibraryImpl(const DynamicLibraryImpl&) = delete;
+  DynamicLibraryImpl(DynamicLibraryImpl&&) = delete;
+  DynamicLibraryImpl& operator=(const DynamicLibraryImpl&) = delete;
+  DynamicLibraryImpl& operator=(DynamicLibraryImpl&&) = delete;
   ~DynamicLibraryImpl() override {
   }
 
@@ -892,7 +898,7 @@ void Platform::DebugDisplay(const char* s) {
 void Platform::DebugPrintf(const char*, ...) {
 }
 
-// Not supported for AWTK+
+// Not supported for AWTK
 static bool assertionPopUps = true;
 
 bool Platform::ShowAssertionPopUps(bool assertionPopUps_) {

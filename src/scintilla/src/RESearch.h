@@ -12,55 +12,58 @@
 namespace Scintilla {
 
 class CharacterIndexer {
- public:
-  virtual char CharAt(Sci::Position index) const = 0;
-  virtual ~CharacterIndexer() {
-  }
+public:
+	virtual char CharAt(Sci::Position index) const=0;
+	virtual ~CharacterIndexer() {
+	}
 };
 
 class RESearch {
- public:
-  explicit RESearch(CharClassify* charClassTable);
-  // No dynamic allocation so default copy constructor and assignment operator are OK.
-  ~RESearch();
-  void Clear();
-  void GrabMatches(const CharacterIndexer& ci);
-  const char* Compile(const char* pattern, Sci::Position length, bool caseSensitive, bool posix);
-  int Execute(const CharacterIndexer& ci, Sci::Position lp, Sci::Position endp);
 
-  enum { MAXTAG = 10 };
-  enum { NOTFOUND = -1 };
+public:
+	explicit RESearch(CharClassify *charClassTable);
+	// No dynamic allocation so default copy constructor and assignment operator are OK.
+	~RESearch();
+	void Clear() noexcept;
+	void GrabMatches(const CharacterIndexer &ci);
+	const char *Compile(const char *pattern, Sci::Position length, bool caseSensitive, bool posix) noexcept;
+	int Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp);
 
-  Sci::Position bopat[MAXTAG];
-  Sci::Position eopat[MAXTAG];
-  std::string pat[MAXTAG];
+	static constexpr int MAXTAG = 10;
+	static constexpr int NOTFOUND = -1;
 
- private:
-  enum { MAXNFA = 4096 };
-  // The following enums are not meant to be changeable.
-  // They are for readability only.
-  enum { MAXCHR = 256 };
-  enum { CHRBIT = 8 };
-  enum { BITBLK = MAXCHR / CHRBIT };
+	Sci::Position bopat[MAXTAG];
+	Sci::Position eopat[MAXTAG];
+	std::string pat[MAXTAG];
 
-  void ChSet(unsigned char c);
-  void ChSetWithCase(unsigned char c, bool caseSensitive);
-  int GetBackslashExpression(const char* pattern, int& incr);
+private:
 
-  Sci::Position PMatch(const CharacterIndexer& ci, Sci::Position lp, Sci::Position endp, char* ap);
+	static constexpr int MAXNFA = 4096;
+	// The following constants are not meant to be changeable.
+	// They are for readability only.
+	static constexpr int MAXCHR = 256;
+	static constexpr int CHRBIT = 8;
+	static constexpr int BITBLK = MAXCHR / CHRBIT;
 
-  Sci::Position bol;
-  Sci::Position tagstk[MAXTAG]; /* subpat tag stack */
-  char nfa[MAXNFA];             /* automaton */
-  int sta;
-  unsigned char bittab[BITBLK]; /* bit table for CCL pre-set bits */
-  int failure;
-  CharClassify* charClass;
-  bool iswordc(unsigned char x) const {
-    return charClass->IsWord(x);
-  }
+	void ChSet(unsigned char c) noexcept;
+	void ChSetWithCase(unsigned char c, bool caseSensitive) noexcept;
+	int GetBackslashExpression(const char *pattern, int &incr) noexcept;
+
+	Sci::Position PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp, char *ap);
+
+	Sci::Position bol;
+	Sci::Position tagstk[MAXTAG];  /* subpat tag stack */
+	char nfa[MAXNFA];    /* automaton */
+	int sta;
+	unsigned char bittab[BITBLK]; /* bit table for CCL pre-set bits */
+	int failure;
+	CharClassify *charClass;
+	bool iswordc(unsigned char x) const noexcept {
+		return charClass->IsWord(x);
+	}
 };
 
-}  // namespace Scintilla
+}
 
 #endif
+

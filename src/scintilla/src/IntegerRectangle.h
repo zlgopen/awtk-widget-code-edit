@@ -11,25 +11,19 @@
 namespace Scintilla {
 
 struct IntegerRectangle {
-  int left;
-  int top;
-  int right;
-  int bottom;
+	int left;
+	int top;
+	int right;
+	int bottom;
 
-  explicit IntegerRectangle(PRectangle rc) noexcept
-      : left(static_cast<int>(rc.left)),
-        top(static_cast<int>(rc.top)),
-        right(static_cast<int>(rc.right)),
-        bottom(static_cast<int>(rc.bottom)) {
-  }
-  int Width() const noexcept {
-    return right - left;
-  }
-  int Height() const noexcept {
-    return bottom - top;
-  }
+	explicit IntegerRectangle(PRectangle rc) noexcept :
+		left(static_cast<int>(rc.left)), top(static_cast<int>(rc.top)),
+		right(static_cast<int>(rc.right)), bottom(static_cast<int>(rc.bottom)) {
+	}
+	int Width() const noexcept { return right - left; }
+	int Height() const noexcept { return bottom - top; }
 };
 
-}  // namespace Scintilla
+}
 
 #endif

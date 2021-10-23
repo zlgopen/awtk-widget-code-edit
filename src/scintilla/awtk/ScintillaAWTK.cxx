@@ -9,7 +9,6 @@
 #include <stdexcept>
 #include <new>
 #include <string>
-#include <string_view>
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -21,7 +20,6 @@
 #include "ILexer.h"
 #include "Scintilla.h"
 #include "ScintillaWidget.h"
-#include "SciLexer.h"
 #include "StringCopy.h"
 #include "CharacterCategory.h"
 #include "LexerModule.h"
