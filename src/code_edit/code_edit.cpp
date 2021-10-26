@@ -184,7 +184,7 @@ ret_t code_edit_set_code_theme(widget_t* widget, const char* code_theme) {
   return_value_if_fail(code_edit != NULL, RET_BAD_PARAMS);
 
   code_edit->code_theme = tk_str_copy(code_edit->code_theme, code_theme);
-  
+
   return code_edit_apply_lang_theme(widget);
 }
 
@@ -619,4 +619,3 @@ ret_t code_edit_load(widget_t* widget, const char* filename) {
 bool_t code_edit_is_modified(widget_t* widget) {
   return code_edit_cmd_bool_void(widget, SCI_GETMODIFY);
 }
-

@@ -13,58 +13,59 @@
 namespace Scintilla {
 
 class CatalogueModules {
-	std::vector<LexerModule *> lexerCatalogue;
-public:
-	const LexerModule *Find(int language) {
-		for (const LexerModule *lm : lexerCatalogue) {
-			if (lm->GetLanguage() == language) {
-				return lm;
-			}
-		}
-		return nullptr;
-	}
+  std::vector<LexerModule*> lexerCatalogue;
 
-	const LexerModule *Find(const char *languageName) {
-		if (languageName) {
-			for (const LexerModule *lm : lexerCatalogue) {
-				if (lm->languageName && (0 == strcmp(lm->languageName, languageName))) {
-					return lm;
-				}
-			}
-		}
-		return nullptr;
-	}
+ public:
+  const LexerModule* Find(int language) {
+    for (const LexerModule* lm : lexerCatalogue) {
+      if (lm->GetLanguage() == language) {
+        return lm;
+      }
+    }
+    return nullptr;
+  }
 
-	void AddLexerModule(LexerModule *plm) {
-		lexerCatalogue.push_back(plm);
-	}
+  const LexerModule* Find(const char* languageName) {
+    if (languageName) {
+      for (const LexerModule* lm : lexerCatalogue) {
+        if (lm->languageName && (0 == strcmp(lm->languageName, languageName))) {
+          return lm;
+        }
+      }
+    }
+    return nullptr;
+  }
 
-	unsigned int Count() {
-		return static_cast<unsigned int>(lexerCatalogue.size());
-	}
+  void AddLexerModule(LexerModule* plm) {
+    lexerCatalogue.push_back(plm);
+  }
 
-	const char *Name(unsigned int index) {
-		if (index < static_cast<unsigned int>(lexerCatalogue.size())) {
-			return lexerCatalogue[index]->languageName;
-		} else {
-			return "";
-		}
-	}
+  unsigned int Count() {
+    return static_cast<unsigned int>(lexerCatalogue.size());
+  }
 
-	LexerFactoryFunction Factory(unsigned int index) {
-		// Works for object lexers but not for function lexers
-		return lexerCatalogue[index]->fnFactory;
-	}
+  const char* Name(unsigned int index) {
+    if (index < static_cast<unsigned int>(lexerCatalogue.size())) {
+      return lexerCatalogue[index]->languageName;
+    } else {
+      return "";
+    }
+  }
 
-	ILexer *Create(unsigned int index) {
-		const LexerModule *plm = lexerCatalogue[index];
-		if (!plm) {
-			return nullptr;
-		}
-		return plm->Create();
-	}
+  LexerFactoryFunction Factory(unsigned int index) {
+    // Works for object lexers but not for function lexers
+    return lexerCatalogue[index]->fnFactory;
+  }
+
+  ILexer* Create(unsigned int index) {
+    const LexerModule* plm = lexerCatalogue[index];
+    if (!plm) {
+      return nullptr;
+    }
+    return plm->Create();
+  }
 };
 
-}
+}  // namespace Scintilla
 
 #endif

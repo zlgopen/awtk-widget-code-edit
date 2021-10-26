@@ -10,22 +10,22 @@
 
 namespace Scintilla {
 
-enum { wsSpace=1, wsTab=2, wsSpaceTab=4, wsInconsistent=8 };
+enum { wsSpace = 1, wsTab = 2, wsSpaceTab = 4, wsInconsistent = 8 };
 
 class Accessor;
 class WordList;
 class PropSetSimple;
 
-typedef bool (*PFNIsCommentLeader)(Accessor &styler, Sci_Position pos, Sci_Position len);
+typedef bool (*PFNIsCommentLeader)(Accessor& styler, Sci_Position pos, Sci_Position len);
 
 class Accessor : public LexAccessor {
-public:
-	PropSetSimple *pprops;
-	Accessor(IDocument *pAccess_, PropSetSimple *pprops_);
-	int GetPropertyInt(const char *, int defaultValue=0) const;
-	int IndentAmount(Sci_Position line, int *flags, PFNIsCommentLeader pfnIsCommentLeader = 0);
+ public:
+  PropSetSimple* pprops;
+  Accessor(IDocument* pAccess_, PropSetSimple* pprops_);
+  int GetPropertyInt(const char*, int defaultValue = 0) const;
+  int IndentAmount(Sci_Position line, int* flags, PFNIsCommentLeader pfnIsCommentLeader = 0);
 };
 
-}
+}  // namespace Scintilla
 
 #endif

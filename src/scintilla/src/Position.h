@@ -21,6 +21,6 @@ typedef ptrdiff_t Line;
 
 const Position invalidPosition = -1;
 
-}
+}  // namespace Sci
 
 #endif
