@@ -28,8 +28,6 @@ widget_t* code_edit_create_internal(widget_t* parent, xy_t x, xy_t y, wh_t w, wh
   return_value_if_fail(code_edit != NULL, NULL);
 
   str_init(&(code_edit->text), 0);
-  code_edit->zoom = 5;
-  code_edit->scroll_line = 1;
 
   return widget;
 }

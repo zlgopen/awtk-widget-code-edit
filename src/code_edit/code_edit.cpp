@@ -23,6 +23,7 @@
 #include "tkc/mem.h"
 #include "tkc/utils.h"
 #include "base/widget_vtable.h"
+#include "base/window_manager.h"
 #include "code_edit.h"
 
 #include <cstddef>
@@ -176,6 +177,11 @@ static ret_t code_edit_apply_lang_theme(widget_t* widget) {
   return RET_OK;
 }
 
+static ret_t on_code_edit_apply_lang_theme(void* ctx, event_t* e) {
+  widget_t* widget = WIDGET(ctx);
+  return code_edit_apply_lang_theme(widget);
+}
+
 ret_t code_edit_set_lang(widget_t* widget, const char* lang) {
   code_edit_t* code_edit = CODE_EDIT(widget);
   return_value_if_fail(code_edit != NULL, RET_BAD_PARAMS);
@@ -284,6 +290,23 @@ ret_t code_edit_set_scroll_line(widget_t* widget, int32_t scroll_line) {
   return RET_OK;
 }
 
+ret_t code_edit_insert_text(widget_t* widget, uint32_t offset, const char* text) {
+  ScintillaAWTK* impl = NULL;
+  code_edit_t* code_edit = CODE_EDIT(widget);
+  int64_t len = 0;
+  return_value_if_fail(code_edit != NULL, RET_BAD_PARAMS);
+  impl = static_cast<ScintillaAWTK*>(code_edit->impl);
+  return_value_if_fail(impl != NULL, RET_BAD_PARAMS);
+
+  len = SSM(SCI_GETTEXTLENGTH, 0, 0);
+  return_value_if_fail(len >= 0, RET_FAIL);
+
+  offset = tk_min(offset, len);
+  impl->InsertString(text, offset);
+
+  return RET_OK;
+}
+
 ret_t code_edit_get_prop(widget_t* widget, const char* name, value_t* v) {
   code_edit_t* code_edit = CODE_EDIT(widget);
   return_value_if_fail(code_edit != NULL && name != NULL && v != NULL, RET_BAD_PARAMS);
@@ -365,6 +388,9 @@ ret_t code_edit_on_destroy(widget_t* widget) {
   code_edit_t* code_edit = CODE_EDIT(widget);
   ScintillaAWTK* impl = static_cast<ScintillaAWTK*>(code_edit->impl);
   return_value_if_fail(widget != NULL && code_edit != NULL, RET_BAD_PARAMS);
+
+  widget_off_by_func(window_manager(), EVT_THEME_CHANGED, on_code_edit_apply_lang_theme,
+                     (void*)widget);
 
   TKMEM_FREE(code_edit->lang);
   TKMEM_FREE(code_edit->code_theme);
@@ -491,7 +517,7 @@ ret_t code_edit_on_add_child(widget_t* widget, widget_t* child) {
     widget_on(child, EVT_VALUE_CHANGED, code_edit_on_scroll_bar_changed, widget);
   }
 
-  return RET_FAIL;
+  return RET_CONTINUE;
 }
 
 extern "C" widget_t* code_edit_create_internal(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h);
@@ -501,7 +527,12 @@ widget_t* code_edit_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h) {
   code_edit_t* code_edit = CODE_EDIT(widget);
   return_value_if_fail(code_edit != NULL, NULL);
   code_edit->impl = new (std::nothrow) ScintillaAWTK(widget);
+
+  widget_on(window_manager(), EVT_THEME_CHANGED, on_code_edit_apply_lang_theme, (void*)widget);
+
   code_edit_set_tab_width(widget, 4);
+  code_edit_set_zoom(widget, 5);
+  code_edit_set_scroll_line(widget, 1);
 
   return widget;
 }
@@ -529,7 +560,7 @@ static bool_t code_edit_cmd_bool_void(widget_t* widget, int cmd) {
 }
 
 static ret_t code_edit_get_text(widget_t* widget, value_t* v) {
-  uint32_t len = 0;
+  int64_t len = 0;
   str_t* str = NULL;
   ScintillaAWTK* impl = NULL;
   code_edit_t* code_edit = CODE_EDIT(widget);
@@ -588,6 +619,10 @@ ret_t code_edit_paste(widget_t* widget) {
 
 ret_t code_edit_clear(widget_t* widget) {
   return code_edit_cmd_void_void(widget, SCI_CLEAR);
+}
+
+ret_t code_edit_clear_all(widget_t* widget) {
+  return code_edit_cmd_void_void(widget, SCI_CLEARALL);
 }
 
 ret_t code_edit_select_none(widget_t* widget) {

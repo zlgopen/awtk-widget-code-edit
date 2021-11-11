@@ -409,11 +409,15 @@ ret_t ScintillaAWTK::OnKeyUp(key_event_t* e) {
 }
 
 ret_t ScintillaAWTK::InsertString(const char* str) {
+  return InsertString(str, CurrentPosition());
+}
+
+ret_t ScintillaAWTK::InsertString(const char* str, Sci::Position position) {
   this->ClearSelection();
-  int lengthInserted = pdoc->InsertString(CurrentPosition(), str, strlen(str));
+  int lengthInserted = pdoc->InsertString(position, str, strlen(str));
 
   if (lengthInserted > 0) {
-    this->MovePositionTo(CurrentPosition() + lengthInserted);
+    this->MovePositionTo(position + lengthInserted);
   }
 
   return RET_STOP;

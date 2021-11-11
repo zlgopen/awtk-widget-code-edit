@@ -16,12 +16,14 @@ EXPORTS
     code_edit_set_zoom
     code_edit_set_wrap_word
     code_edit_set_scroll_line
+    code_edit_insert_text
     code_edit_redo
     code_edit_undo
     code_edit_copy
     code_edit_cut
     code_edit_paste
     code_edit_clear
+    code_edit_clear_all
     code_edit_select_none
     code_edit_select_all
     code_edit_can_redo

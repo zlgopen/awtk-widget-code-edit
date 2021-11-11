@@ -246,6 +246,18 @@ ret_t code_edit_set_wrap_word(widget_t* widget, bool_t wrap_word);
 ret_t code_edit_set_scroll_line(widget_t* widget, int32_t scroll_line);
 
 /**
+ * @method code_edit_insert_text
+ * 插入一段文本。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {uint32_t} offset 插入的偏移位置。
+ * @param {const char*} text 待插入的文本。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t code_edit_insert_text(widget_t* widget, uint32_t offset, const char* text);
+
+/**
  * @method code_edit_redo
  * 重做。
  * @annotation ["scriptable"]
@@ -304,6 +316,16 @@ ret_t code_edit_paste(widget_t* widget);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t code_edit_clear(widget_t* widget);
+
+/**
+ * @method code_edit_clear_all
+ * 清除所有内容。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t code_edit_clear_all(widget_t* widget);
 
 /**
  * @method code_edit_select_none

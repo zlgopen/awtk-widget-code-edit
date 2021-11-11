@@ -392,6 +392,34 @@
             "type": "widget_t*",
             "name": "widget",
             "desc": "widget对象。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "offset",
+            "desc": "插入的偏移位置。"
+          },
+          {
+            "type": "const char*",
+            "name": "text",
+            "desc": "待插入的文本。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "插入一段文本。",
+        "name": "code_edit_insert_text",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
           }
         ],
         "annotation": {
@@ -489,6 +517,24 @@
         },
         "desc": "清除内容。",
         "name": "code_edit_clear",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "清除所有内容。",
+        "name": "code_edit_clear_all",
         "return": {
           "type": "ret_t",
           "desc": "返回RET_OK表示成功，否则表示失败。"

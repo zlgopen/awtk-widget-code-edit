@@ -47,6 +47,7 @@ class ScintillaAWTK : public ScintillaBase {
   ret_t OnKeyDown(key_event_t* e);
   ret_t OnKeyUp(key_event_t* e);
   ret_t InsertString(const char* str);
+  ret_t InsertString(const char* str, Sci::Position position);
 
  private:
   struct TimeThunk {
