@@ -11,6 +11,7 @@ class ScintillaAWTK : public ScintillaBase {
   virtual ~ScintillaAWTK();
 
   void OnPaint(widget_t* widget, canvas_t* c);
+  void Invalidate(void);
 
   virtual void CreateCallTipWindow(PRectangle rc) override;
   virtual void AddToPopUp(const char* label, int cmd = 0, bool enabled = true) override;
@@ -37,6 +38,7 @@ class ScintillaAWTK : public ScintillaBase {
 
  public:
   void AddText(const char* str);
+  void ScrollAdd(int32_t delta, bool moveThumb);
   void OnScrollBarChange(const char* name, int32_t value);
   void SetClient(int32_t x, int32_t y, int32_t w, int32_t h);
   ret_t OnPointerDown(pointer_event_t* e);

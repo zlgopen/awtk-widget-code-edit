@@ -22,6 +22,7 @@
 #include "tkc/fs.h"
 #include "tkc/mem.h"
 #include "tkc/utils.h"
+#include "base/widget_vtable.h"
 #include "code_edit.h"
 
 #include <cstddef>
@@ -145,7 +146,12 @@ static ret_t code_edit_apply_lang_theme(widget_t* widget) {
   impl = static_cast<ScintillaAWTK*>(code_edit->impl);
   return_value_if_fail(impl != NULL, RET_BAD_PARAMS);
 
-  if (code_edit->code_theme != NULL && code_edit->lang != NULL) {
+  if (code_edit->lang == NULL) {
+    code_edit->lang = tk_str_copy(code_edit->lang, "NULL");
+    return_value_if_fail(code_edit->lang != NULL, RET_OOM);
+  }
+
+  if (code_edit->code_theme != NULL) {
     const asset_info_t* info = NULL;
     int lexer = sci_lang_value(code_edit->lang);
     assets_manager_t* am = widget_get_assets_manager(widget);
@@ -160,7 +166,7 @@ static ret_t code_edit_apply_lang_theme(widget_t* widget) {
       code_theme_load(&theme, (const char*)(info->data), info->size);
       code_theme_deinit(&theme);
       assets_manager_unref(am, info);
-      SSM(SCI_SETZOOM, 5, 0);
+      SSM(SCI_SETZOOM, code_edit->zoom, 0);
     }
 
     return_value_if_fail(lexer >= 0, RET_BAD_PARAMS);
@@ -243,6 +249,41 @@ ret_t code_edit_set_tab_width(widget_t* widget, uint32_t tab_width) {
   return RET_OK;
 }
 
+ret_t code_edit_set_zoom(widget_t* widget, int32_t zoom) {
+  ScintillaAWTK* impl = NULL;
+  code_edit_t* code_edit = CODE_EDIT(widget);
+  return_value_if_fail(code_edit != NULL, RET_BAD_PARAMS);
+  impl = static_cast<ScintillaAWTK*>(code_edit->impl);
+  return_value_if_fail(impl != NULL, RET_BAD_PARAMS);
+
+  code_edit->zoom = zoom;
+
+  SSM(SCI_SETZOOM, zoom, 0);
+
+  return RET_OK;
+}
+
+ret_t code_edit_set_wrap_word(widget_t* widget, bool_t wrap_word) {
+  ScintillaAWTK* impl = NULL;
+  code_edit_t* code_edit = CODE_EDIT(widget);
+  return_value_if_fail(code_edit != NULL, RET_BAD_PARAMS);
+  impl = static_cast<ScintillaAWTK*>(code_edit->impl);
+  return_value_if_fail(impl != NULL, RET_BAD_PARAMS);
+
+  code_edit->wrap_word = wrap_word;
+
+  SSM(SCI_SETWRAPMODE, wrap_word, 0);
+
+  return RET_OK;
+}
+
+ret_t code_edit_set_scroll_line(widget_t* widget, int32_t scroll_line) {
+  code_edit_t* code_edit = CODE_EDIT(widget);
+  return_value_if_fail(code_edit != NULL, RET_BAD_PARAMS);
+  code_edit->scroll_line = scroll_line;
+  return RET_OK;
+}
+
 ret_t code_edit_get_prop(widget_t* widget, const char* name, value_t* v) {
   code_edit_t* code_edit = CODE_EDIT(widget);
   return_value_if_fail(code_edit != NULL && name != NULL && v != NULL, RET_BAD_PARAMS);
@@ -261,6 +302,15 @@ ret_t code_edit_get_prop(widget_t* widget, const char* name, value_t* v) {
     return RET_OK;
   } else if (tk_str_eq(CODE_EDIT_PROP_SHOW_LINE_NUMBER, name)) {
     value_set_bool(v, code_edit->show_line_number);
+    return RET_OK;
+  } else if (tk_str_eq(CODE_EDIT_PROP_ZOOM, name)) {
+    value_set_int32(v, code_edit->zoom);
+    return RET_OK;
+  } else if (tk_str_eq(CODE_EDIT_PROP_WRAP_WORD, name)) {
+    value_set_bool(v, code_edit->wrap_word);
+    return RET_OK;
+  } else if (tk_str_eq(CODE_EDIT_PROP_SCROLL_LINE, name)) {
+    value_set_int32(v, code_edit->scroll_line);
     return RET_OK;
   } else if (tk_str_eq(CODE_EDIT_PROP_TAB_WIDTH, name)) {
     value_set_uint32(v, code_edit->tab_width);
@@ -291,6 +341,15 @@ ret_t code_edit_set_prop(widget_t* widget, const char* name, const value_t* v) {
   } else if (tk_str_eq(CODE_EDIT_PROP_SHOW_LINE_NUMBER, name)) {
     code_edit_set_show_line_number(widget, value_bool(v));
     return RET_OK;
+  } else if (tk_str_eq(CODE_EDIT_PROP_ZOOM, name)) {
+    code_edit_set_zoom(widget, value_int32(v));
+    return RET_OK;
+  } else if (tk_str_eq(CODE_EDIT_PROP_WRAP_WORD, name)) {
+    code_edit_set_wrap_word(widget, value_bool(v));
+    return RET_OK;
+  } else if (tk_str_eq(CODE_EDIT_PROP_SCROLL_LINE, name)) {
+    code_edit_set_scroll_line(widget, value_int32(v));
+    return RET_OK;
   } else if (tk_str_eq(CODE_EDIT_PROP_TAB_WIDTH, name)) {
     code_edit_set_tab_width(widget, value_uint32(v));
     return RET_OK;
@@ -319,29 +378,17 @@ ret_t code_edit_on_destroy(widget_t* widget) {
   return RET_OK;
 }
 
-ret_t code_edit_on_paint_self(widget_t* widget, canvas_t* c) {
-  point_t p = {0, 0};
-  rect_t save_r = {0, 0, 0, 0};
-  rect_t clip_r = {0, 0, 0, 0};
-  rect_t client_r = {0, 0, 0, 0};
+static ret_t code_edit_on_paint_self_impl(widget_t* widget, canvas_t* c) {
   code_edit_t* code_edit = CODE_EDIT(widget);
   ScintillaAWTK* impl = static_cast<ScintillaAWTK*>(code_edit->impl);
-
   if (impl != NULL) {
-    canvas_get_clip_rect(c, &save_r);
-    widget_to_screen(widget, &p);
-
-    client_r = rect_init(p.x, p.y, widget->w, widget->h);
-    clip_r = rect_intersect(&save_r, &client_r);
-    canvas_set_clip_rect(c, &clip_r);
-
-    impl->SetClient(c->ox, c->oy, widget->w, widget->h);
     impl->OnPaint(widget, c);
-
-    canvas_set_clip_rect(c, &save_r);
   }
-
   return RET_OK;
+}
+
+ret_t code_edit_on_paint_self(widget_t* widget, canvas_t* c) {
+  return widget_paint_with_clip(widget, NULL, c, code_edit_on_paint_self_impl);
 }
 
 ret_t code_edit_on_event(widget_t* widget, event_t* e) {
@@ -397,6 +444,23 @@ ret_t code_edit_on_event(widget_t* widget, event_t* e) {
       im_commit_event_t* evt = (im_commit_event_t*)e;
       ret = impl->InsertString(evt->text);
       widget_invalidate(widget, NULL);
+      break;
+    }
+    case EVT_WHEEL: {
+      wheel_event_t* evt = (wheel_event_t*)e;
+      int32_t delta = evt->dy;
+      if (delta > 0) {
+        impl->ScrollAdd(-code_edit->scroll_line, TRUE);
+      } else if (delta < 0) {
+        impl->ScrollAdd(code_edit->scroll_line, TRUE);
+      }
+    }
+    case EVT_WIDGET_LOAD:
+    case EVT_MOVE_RESIZE: {
+      point_t p = {0, 0};
+      widget_to_screen(widget, &p);
+      impl->SetClient(p.x, p.y, widget->w, widget->h);
+      impl->Invalidate();
       break;
     }
     default:

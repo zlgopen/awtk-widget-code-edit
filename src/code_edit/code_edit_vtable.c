@@ -1,8 +1,13 @@
 ﻿#include "tkc/utils.h"
 #include "code_edit/code_edit.h"
 
-const char* s_code_edit_properties[] = {CODE_EDIT_PROP_LANG, CODE_EDIT_PROP_FILENAME,
-                                        CODE_EDIT_PROP_SHOW_LINE_NUMBER, NULL};
+const char* s_code_edit_properties[] = {CODE_EDIT_PROP_LANG,
+                                        CODE_EDIT_PROP_FILENAME,
+                                        CODE_EDIT_PROP_SHOW_LINE_NUMBER,
+                                        CODE_EDIT_PROP_ZOOM,
+                                        CODE_EDIT_PROP_WRAP_WORD,
+                                        CODE_EDIT_PROP_SCROLL_LINE,
+                                        NULL};
 
 TK_DECL_VTABLE(code_edit) = {.size = sizeof(code_edit_t),
                              .type = WIDGET_TYPE_CODE_EDIT,
@@ -23,6 +28,8 @@ widget_t* code_edit_create_internal(widget_t* parent, xy_t x, xy_t y, wh_t w, wh
   return_value_if_fail(code_edit != NULL, NULL);
 
   str_init(&(code_edit->text), 0);
+  code_edit->zoom = 5;
+  code_edit->scroll_line = 1;
 
   return widget;
 }

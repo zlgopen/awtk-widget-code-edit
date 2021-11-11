@@ -13,6 +13,9 @@ EXPORTS
     code_edit_set_show_line_number
     code_edit_set_readonly
     code_edit_set_tab_width
+    code_edit_set_zoom
+    code_edit_set_wrap_word
+    code_edit_set_scroll_line
     code_edit_redo
     code_edit_undo
     code_edit_copy

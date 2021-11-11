@@ -90,11 +90,32 @@ typedef struct _code_edit_t {
   bool_t readonly;
 
   /**
+   * @property {bool_t} wrap_word
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 是否自动折行。
+   */
+  bool_t wrap_word;
+
+  /**
    * @property {uint32_t} tab_width
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
    * tab的宽度。
    */
   uint32_t tab_width;
+
+  /**
+   * @property {int32_t} scroll_line
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 鼠标一次滚动行数。
+   */
+  int32_t scroll_line;
+
+  /**
+   * @property {int32_t} zoom
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 缩放等级。
+   */
+  int32_t zoom;
 
   /*private*/
   void* impl;
@@ -182,7 +203,7 @@ ret_t code_edit_set_readonly(widget_t* widget, bool_t readonly);
 
 /**
  * @method code_edit_set_tab_width
- * 设置 tab的宽度。。
+ * 设置 tab的宽度。
  * @annotation ["scriptable"]
  * @param {widget_t*} widget widget对象。
  * @param {uint32_t} tab_width tab的宽度。。
@@ -190,6 +211,39 @@ ret_t code_edit_set_readonly(widget_t* widget, bool_t readonly);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t code_edit_set_tab_width(widget_t* widget, uint32_t tab_width);
+
+/**
+ * @method code_edit_set_zoom
+ * 设置 缩放等级。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {int32_t} zoom 缩放等级。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t code_edit_set_zoom(widget_t* widget, int32_t zoom);
+
+/**
+ * @method code_edit_set_wrap_word
+ * 设置 是否自动折行。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {bool_t} wrap_word 是否自动折行。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t code_edit_set_wrap_word(widget_t* widget, bool_t wrap_word);
+
+/**
+ * @method code_edit_set_scroll_line
+ * 设置 滚动速度。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {int32_t} scroll_line 滚动行数。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t code_edit_set_scroll_line(widget_t* widget, int32_t scroll_line);
 
 /**
  * @method code_edit_redo
@@ -359,6 +413,9 @@ bool_t code_edit_is_modified(widget_t* widget);
 #define CODE_EDIT_PROP_TAB_WIDTH "tab_width"
 #define CODE_EDIT_PROP_CODE_THEME "code_theme"
 #define CODE_EDIT_PROP_SHOW_LINE_NUMBER "show_line_number"
+#define CODE_EDIT_PROP_ZOOM "zoom"
+#define CODE_EDIT_PROP_WRAP_WORD "wrap_word"
+#define CODE_EDIT_PROP_SCROLL_LINE "scroll_line"
 
 #define WIDGET_TYPE_CODE_EDIT "code_edit"
 

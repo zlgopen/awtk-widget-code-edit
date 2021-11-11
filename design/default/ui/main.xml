@@ -1,20 +1,18 @@
-<window theme="main" >
-  <code_edit name="code" x="10" y="10" w="-20" h="-108" code_theme="stylers" filename="data/test.c" tab_width="2">
-   <scroll_bar_d name="vbar" x="right" y="0" w="14" h="100%" value="0"/>
+<window theme="main" name="main">
+  <code_edit name="code" x="10" y="10" w="-20" h="-108" code_theme="stylers" filename="data/test.c" wrap_word="true" tab_width="2" disg:custom="container">
+    <scroll_bar_d name="vbar" x="right" y="0" w="14" h="100%" value="0"/>
   </code_edit>
-
   <view x="10" y="b:50" w="-20" h="40" children_layout="default(r=1,c=4,s=5,m=2)">
-    <check_button name="readonly" text="Readonly" />
-    <check_button name="utf8_bom" text="With UTF8 BOM" />
-    <check_button name="show_line_number" text="Show Line Number" value="true"/>
+    <check_button name="readonly" text="Readonly"/>
+    <check_button name="utf8_bom" text="With UTF8 BOM"/>
+    <check_button name="show_line_number" value="true" text="Show Line Number"/>
     <combo_box name="theme" options="stylers;khaki;Monokai" text="stylers"/>
   </view>
-
   <view x="10" y="b:10" w="-20" h="40" children_layout="default(r=1,c=5,s=5,m=2)">
-    <button name="save" text="Save" />
-    <button name="load" text="Load" />
-    <button name="redo" text="Redo" />
-    <button name="undo" text="Undo" />
-    <button name="quit" text="Quit" />
+    <button name="save" text="Save"/>
+    <button name="load" text="Load"/>
+    <button name="redo" text="Redo"/>
+    <button name="undo" text="Undo"/>
+    <button name="quit" text="Quit"/>
   </view>
 </window>

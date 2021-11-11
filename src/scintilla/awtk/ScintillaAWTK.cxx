@@ -137,7 +137,7 @@ void ScintillaAWTK::SetVerticalScrollPos() {
     } else {
       value = value * virtual_h / (virtual_h - bar->h);
     }
-    scroll_bar_set_value_only(bar, value);
+    scroll_bar_set_value(bar, value);
   }
 }
 
@@ -204,6 +204,12 @@ void ScintillaAWTK::OnPaint(widget_t* widget, canvas_t* c) {
   surfaceWindow->Release();
 }
 
+void ScintillaAWTK::Invalidate(void) {
+  if (this != NULL) {
+    this->InvalidateStyleRedraw();
+  }
+}
+
 bool ScintillaAWTK::FineTickerRunning(TickReason reason) {
   return timers[reason].timer != TK_INVALID_ID;
 }
@@ -252,6 +258,10 @@ bool ScintillaAWTK::SetIdle(bool on) {
 
 void ScintillaAWTK::AddText(const char* str) {
   this->AddCharUTF(str, strlen(str));
+}
+
+void ScintillaAWTK::ScrollAdd(int32_t delta, bool moveThumb) {
+  this->ScrollTo(this->topLine + delta, moveThumb);
 }
 
 void ScintillaAWTK::SetClient(int32_t x, int32_t y, int32_t w, int32_t h) {
