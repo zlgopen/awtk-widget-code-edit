@@ -430,27 +430,22 @@ ret_t code_edit_on_event(widget_t* widget, event_t* e) {
   switch (e->type) {
     case EVT_POINTER_DOWN: {
       ret = impl->OnPointerDown((pointer_event_t*)e);
-      widget_invalidate(widget, NULL);
       break;
     }
     case EVT_POINTER_MOVE: {
       ret = impl->OnPointerMove((pointer_event_t*)e);
-      widget_invalidate(widget, NULL);
       break;
     }
     case EVT_POINTER_UP: {
       ret = impl->OnPointerUp((pointer_event_t*)e);
-      widget_invalidate(widget, NULL);
       break;
     }
     case EVT_KEY_DOWN: {
       ret = impl->OnKeyDown((key_event_t*)e);
-      widget_invalidate(widget, NULL);
       break;
     }
     case EVT_KEY_UP: {
       ret = impl->OnKeyUp((key_event_t*)e);
-      widget_invalidate(widget, NULL);
       break;
     }
     case EVT_BLUR: {
@@ -469,7 +464,6 @@ ret_t code_edit_on_event(widget_t* widget, event_t* e) {
     case EVT_IM_COMMIT: {
       im_commit_event_t* evt = (im_commit_event_t*)e;
       ret = impl->InsertString(evt->text);
-      widget_invalidate(widget, NULL);
       break;
     }
     case EVT_WHEEL: {
@@ -520,6 +514,16 @@ ret_t code_edit_on_add_child(widget_t* widget, widget_t* child) {
   return RET_CONTINUE;
 }
 
+static ret_t code_edit_on_invalidate_idle(const idle_info_t* idle) {
+  widget_t* widget = WIDGET(idle->ctx);
+  return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
+
+  if (widget->visible && widget->opacity > 0x08 && widget->w > 0 && widget->h > 0) {
+    widget_invalidate(widget, NULL);
+  }
+  return RET_REPEAT;
+}
+
 extern "C" widget_t* code_edit_create_internal(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h);
 
 widget_t* code_edit_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h) {
@@ -529,6 +533,8 @@ widget_t* code_edit_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h) {
   code_edit->impl = new (std::nothrow) ScintillaAWTK(widget);
 
   widget_on(window_manager(), EVT_THEME_CHANGED, on_code_edit_apply_lang_theme, (void*)widget);
+
+  widget_add_idle(widget, code_edit_on_invalidate_idle);
 
   code_edit_set_tab_width(widget, 4);
   code_edit_set_zoom(widget, 5);
