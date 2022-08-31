@@ -58,6 +58,10 @@
 #if defined(__WIN32__) || defined(_MSC_VER)
 #undef PLAT_GTK_WIN32
 #define PLAT_GTK_WIN32 1
+
+#undef PLAT_WIN
+#define PLAT_WIN 1
+
 #endif
 
 #if defined(__APPLE__)
@@ -69,11 +73,6 @@
 
 #undef PLAT_MACOSX
 #define PLAT_MACOSX 1
-
-#else
-#undef PLAT_WIN
-#define PLAT_WIN 1
-
 #endif
 
 namespace Scintilla {
